@@ -54,7 +54,7 @@
                             <div class="text-sm text-gray-500">{{ topic.note }}</div>
                           </td>
                           <td  class="px-4 py-4 whitespace-nowrap  text-sm flex justify-end text-right  font-medium">
-                            <Link :href="route('topic.create')" title="Add subject" class="text-green-600" ><subject-add /></Link>
+                            <!-- <Link :href="route('topic.create')" title="Add subject" class="text-green-600" ><subject-add /></Link> -->
                             <Edit-link  :edit="{route: 'topic.edit', to:topic.id }" showicon />
                           </td>
                         </tr>
