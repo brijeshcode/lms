@@ -15,8 +15,8 @@ class TopicController extends Controller
 
     public function index(Request $request)
     {
-        $topics = Topic::select('id', 'chapter_id', 'name', 'note', 'active')
-        ->with('chapter:id,name')
+        $topics = Topic::select('id', 'class_id', 'subject_id', 'chapter_id', 'name', 'note', 'active')
+        ->with('chapter:id,name', 'stClass:id,name', 'subject:id,name')
             ->when($request->search, function ($query, $search){
                 $query->where('name', 'like', '%'. $search . '%');
                 // $query->orWhere('description', 'like', '%'. $search . '%');

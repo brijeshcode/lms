@@ -159,11 +159,11 @@ class StudentClassSeeder extends Seeder
                 if (!isset($subject['chapters']))continue;
 
                 foreach ($subject['chapters'] as $key => $chapter) {
-                    $chapterId = Chapter::create(['subject_id' => $subjectId, 'name' => $chapter['name']])->id;
+                    $chapterId = Chapter::create(['class_id' => $classId, 'subject_id' => $subjectId, 'name' => $chapter['name']])->id;
                     if (!isset($chapter['topics']))continue;
 
                     foreach ($chapter['topics'] as $key => $topic) {
-                        Topic::create(['chapter_id' => $chapterId, 'name' => $topic]);
+                        Topic::create(['class_id' => $classId, 'subject_id' => $subjectId, 'chapter_id' => $chapterId, 'name' => $topic]);
                     }
                 }
             }

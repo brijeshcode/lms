@@ -29,7 +29,10 @@
                       <thead class="bg-gray-50">
                         <tr>
                           <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Name
+                            Topic
+                          </th>
+                          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Detail
                           </th>
                           <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                              Note
@@ -49,6 +52,10 @@
                             <span v-else class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
                               in-Active
                             </span>
+                          </td>
+                          <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <div class="text-sm text-gray-900">{{ topic.chapter.name }}</div>
+                            <div class="text-sm text-gray-500">{{ topic.st_class.name }}, {{ topic.subject.name }}</div>
                           </td>
                           <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                             <div class="text-sm text-gray-500">{{ topic.note }}</div>
