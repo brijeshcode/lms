@@ -2,6 +2,7 @@
 
 namespace App\Models\Setup;
 
+use App\Models\Quizzer\Question;
 use App\Models\Setup\Subject;
 use App\Traits\Authorable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -22,5 +23,10 @@ class Chapter extends Model
     public function subject()
     {
       return $this->belongsTo(Subject::class);
+    }
+
+    public function questions()
+    {
+      return $this->hasMany(Question::class);
     }
 }

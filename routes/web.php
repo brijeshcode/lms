@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Quizzer\QuestionController;
+use App\Http\Controllers\Quizzer\QuizController;
 use App\Http\Controllers\Setup\ChapterController;
 use App\Http\Controllers\Setup\StudentClassController;
 use App\Http\Controllers\Setup\SubjectController;
@@ -34,8 +36,13 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
 
+    // class
     Route::resource('/studentclasses', StudentClassController::class)->except(['destroy']);
     Route::resource('/subject', SubjectController::class)->except(['destroy']);
     Route::resource('/chapter', ChapterController::class)->except(['destroy']);
     Route::resource('/topic', TopicController::class)->except(['destroy']);
+
+    // quizzer
+    Route::resource('/question', QuestionController::class)->except(['destroy']);
+    Route::resource('/quiz', QuizController::class)->except(['destroy']);
 });

@@ -31,9 +31,9 @@ class TopicController extends Controller
 
     public function create()
     {
-        $classes = StudentClass::whereActive(1)->has('subjects')->get();
-        $subjects = Subject::whereActive(1)->has('chapters')->get();
-        $chapters = Chapter::whereActive(1)->get();
+        $classes = StudentClass::select('id', 'name')->whereActive(1)->has('subjects')->has('chapters')->get();
+        $subjects = Subject::select('id', 'name', 'class_id')->whereActive(1)->has('chapters')->get();
+        $chapters = Chapter::select('id','name','subject_id')->whereActive(1)->get();
         return Inertia::render('Setup/Topic/Create', compact('classes', 'subjects', 'chapters'));
     }
 
@@ -52,11 +52,10 @@ class TopicController extends Controller
 
     public function edit(Topic $topic)
     {
-        $classes = StudentClass::select('id', 'name')->whereActive(1)->has('subjects')->get();
-        $subjects = Subject::select('id', 'name', 'class_id')->whereActive(1)->get();
-        $chapters = Chapter::whereActive(1)->get();
-        $topic->load('chapter:id,subject_id' )->only('id', 'class_id', 'subject_id','chapter_id', 'name', 'description','note', 'active', 'subject_id', 'subject');
-        $topic->only('id', 'chapter_id', 'name', 'description', 'note', 'active');
+        $classes = StudentClass::select('id', 'name')->whereActive(1)->has('subjects')->has('chapters')->get();
+        $subjects = Subject::select('id', 'name', 'class_id')->whereActive(1)->has('chapters')->get();
+        $chapters = Chapter::select('id','name','subject_id')->whereActive(1)->get();
+        $topic->only('id', 'class_id', 'subject_id','chapter_id', 'name', 'pdf_link','video_link', 'description','note', 'active', 'subject_id');
         return Inertia::render('Setup/Topic/Create', compact('topic', 'classes','subjects', 'chapters'));
     }
 
@@ -77,7 +76,9 @@ class TopicController extends Controller
             ],
             [
                 'name.required' => $tempName .' Name is empty.',
-                'chapter_id.required' => $tempName . ' class field is required.'
+                'class_id.required' => $tempName . ' Class field is required.',
+                'subject_id.required' => $tempName . ' Subject field is required.',
+                'chapter_id.required' => $tempName . ' Chapter field is required.',
             ]
         );
     }

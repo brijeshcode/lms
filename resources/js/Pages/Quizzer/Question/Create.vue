@@ -1,20 +1,20 @@
 <template>
-    <admin-layout title="Topic">
+    <admin-layout title="Question">
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Topic <span v-if="edit">Edit</span> <span v-else>Add</span>
+                Question <span v-if="edit">Edit</span> <span v-else>Add</span>
             </h2>
         </template>
 
         <template #breadcrum>
-            <bread-simple v-if="edit" :items="[ { route: 'topic.index'}, { name:'edit'} ]" />
-            <bread-simple v-else :items="[ { route: 'topic.index'}, {route: 'topic.create', name:'Add'} ]" />
+            <bread-simple v-if="edit" :items="[ { route: 'question.index'}, { name:'edit'} ]" />
+            <bread-simple v-else :items="[ { route: 'question.index'}, {route: 'question.create', name:'Add'} ]" />
         </template>
 
 
         <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
             <div class="p-2">
-                <form @submit.prevent=" topic ? form.put(route('topic.update', topic.id)) : form.post(route('topic.store'))">
+                <form @submit.prevent=" question ? form.put(route('question.update', question.id)) : form.post(route('question.store'))">
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-4">
 
                         <div class="control">
@@ -40,39 +40,63 @@
                             </select>
                             <input-error :message="form.errors.chapter_id" class="mt-2" />
                         </div>
-
                     </div>
 
                     <div class="grid gird-cols-1 gap-4 mb-4">
                         <div class="control">
-                            <form-label for="name" required value="Name" />
-                            <form-input id="name" type="text" required class="mt-1 w-full" v-model="form.name" autocomplete="name" />
-                            <input-error :message="form.errors.name" class="mt-2" />
+                            <form-label for="title" required value="Question" />
+                            <form-input id="title" type="text" required class="mt-1 w-full" v-model="form.title" autocomplete="title" />
+                            <input-error :message="form.errors.title" class="mt-2" />
+                        </div>
+                    </div>
+                    <div class="grid gird-cols-1 mb-4 gap-4">
+                        <div>
+                            <form-label for="body" value="Description" />
+                            <form-text-area id="body" rows="3" class="mt-1 w-full" v-model="form.body" autocomplete="body" ></form-text-area>
+                            <input-error :message="form.errors.body" class="mt-2" />
+                        </div>
+                    </div>
+                    <div class="grid gird-cols-1 mb-4 gap-4">
+                        <h2 class="text-lg border-b">Add Options <span class="inline-block text-green-500 cursor-pointer" @click="addOption"><plus-icon /></span></h2>
+                        <input-error :message="form.errors.options" class="mt-2" />
+                        <div class="options grid gird-cols-1 md:grid-cols-12 mb-4 gap-2" v-for="(opt, index) in form.options">
+
+                            <div>
+                                <form-label for="option_number" required value="Index" />
+                                <form-input id="option_number" type="text" class="mt-1 w-full" v-model="opt.option_number" autocomplete="option_number" />
+                                <input-error :message="form.errors['options.'+index+'.option_number']" class="mt-2" />
+                            </div>
+
+                            <div class="col-span-3">
+                                <form-label for="option" required value="Option" />
+                                <form-input id="option" type="text" class="mt-1 w-full" v-model="opt.option" autocomplete="option" />
+                                <input-error :message="form.errors['options.'+index+'.option']" class="mt-2" />
+                            </div>
+
+                            <div class="col-span-6">
+                                <form-label for="explanation" value="Explanation" />
+                                <form-input id="explanation" type="text" class="mt-1 w-full" v-model="opt.explanation" autocomplete="explanation" />
+                                <input-error :message="form.errors['options.'+index+'.explanation']" class="mt-2" />
+                            </div>
+
+                            <div class="col-span-1">
+                                <form-label  value="Correct" />
+                                <form-input  type="radio" :checked="opt.is_correct == 1" class="mt-1" @click="updateAns(index)" name="answer" v-model="opt.is_correct" autocomplete="is_correct" />
+                                <input-error :message="form.errors['options.'+index+'.is_correct']" class="mt-2" />
+                            </div>
+
+                            <div class="col-span-1 justify-self-center flex justify-center items-center">
+                                <div v-if="index == 0" class="text-green-500 cursor-pointer" @click="addOption"><plus-icon /></div>
+                                <div v-else class="text-red-500 cursor-pointer" @click="removeOption(index)" ><trash-icon /></div>
+                            </div>
                         </div>
                     </div>
 
                     <div class="grid gird-cols-1 mb-4 gap-4">
-                        <div>
-                            <form-label for="description" value="Description" />
-                            <form-text-area id="description" type="text" rows="3" class="mt-1 w-full" v-model="form.description" autocomplete="description" />
-                            <input-error :message="form.errors.description" class="mt-2" />
-                        </div>
-
-                        <div class="control">
-                            <form-label for="pdf_link" required value="Pdf" />
-                            <input type="file" id="pdf_link" @input="form.pdf_link = $event.target.files[0]" class="  w-full border-[1.5px] border-form-stroke rounded-lg font-medium text-body-color placeholder-body-color outline-none focus:border-primary active:border-primary transition  disabled:bg-[#F5F7FD] disabled:cursor-default cursor-pointer file:bg-[#F5F7FD] file:border-0 file:border-solid file:border-r file:border-collapse file:border-form-stroke file:py-3 file:px-5 file:mr-5 file:text-body-color file:cursor-pointer file:hover:bg-primary file:hover:bg-opacity-10" />
-                            <input-error :message="form.errors.pdf_link" class="mt-2" />
-                        </div>
-
-                        <div class="control">
-                            <form-label for="video_link" required value="Video Link" />
-                            <form-input id="video_link" type="url" required class="mt-2 w-full" v-model="form.video_link" autocomplete="video_link" />
-                            <input-error :message="form.errors.video_link" class="mt-2" />
-                        </div>
 
                         <div class="border-t pt-2">
-                            <form-label for="note" value="Note" />
-                            <form-text-area id="note" type="text" rows="3" class="mt-1 w-full" v-model="form.note" autocomplete="note" />
+                            <form-label for="note" value="Admin Note" />
+                            <form-text-area id="note" rows="3" class="mt-1 w-full" v-model="form.note" autocomplete="note" ></form-text-area>
                             <input-error :message="form.errors.note" class="mt-2" />
                         </div>
                     </div>
@@ -107,6 +131,8 @@
     import InputError from '@/Shared/Components/Form/Simple/InputError.vue'
     import FormCheckbox from '@/Shared/Components/Form/Simple/Checkbox.vue'
     import BreadSimple from '@/Shared/Components/Breadcrum/Simple.vue'
+    import plusIcon from '@/Shared/Components/Icons/svg/Plus.vue'
+    import trashIcon from '@/Shared/Components/Icons/svg/Trash.vue'
     // import { Link } from '@inertiajs/inertia-vue3';
 
     export default defineComponent({
@@ -118,9 +144,11 @@
             BreadSimple,
             AdminLayout,
             SimpleButton,
-            FormCheckbox
+            FormCheckbox,
+            plusIcon,
+            trashIcon
         },
-        props: ['topic', 'classes', 'subjects', 'chapters'],
+        props: ['question', 'classes', 'subjects', 'chapters'],
          data: () => ({
             edit: false,
             class_subjects: [],
@@ -129,14 +157,14 @@
          }),
         setup () {
             const form = useForm({
-              name: null,
-              description: null,
-              note: null,
               chapter_id: null,
               subject_id: null,
               class_id: null,
-              video_link: null,
-              pdf_link: null,
+              topic_id: null,
+              title: null,
+              body: null,
+              note: null,
+              options: [],
               active: false
 
             })
@@ -144,9 +172,9 @@
         },
 
         created(){
-            if (this.topic) {
-                Object.keys(this.topic).forEach((index) => {
-                    this.form[index] = this.topic[index];
+            if (this.question) {
+                Object.keys(this.question).forEach((index) => {
+                    this.form[index] = this.question[index];
                 });
                 this.classSubject(this.form.class_id);
                 this.subjectChapter(this.form.subject_id);
@@ -174,6 +202,26 @@
                     console.log(chapter.subject_id);
                    if (chapter.subject_id == subject_id) {this.subject_chapters.push(chapter)} ;
                 });
+            },
+
+            addOption(){
+                this.form.options.push({
+                    option:null,
+                    option_number: null,
+                    is_correct: false,
+                    explanation: null,
+                });
+            },
+
+            removeOption(index) {
+                if (confirm('Are you sure?')) { this.form.options.splice(index, 1); }
+            },
+
+            updateAns(index){
+                this.form.options.forEach((option, key) => {
+                    this.form.options[key].is_correct = 0;
+                });
+                this.form.options[index].is_correct = 1;
             }
         }
     })

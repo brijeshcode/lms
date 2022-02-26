@@ -2,6 +2,7 @@
 
 namespace App\Models\Setup;
 
+use App\Models\Quizzer\Question;
 use App\Models\Setup\Chapter;
 use App\Models\Setup\StudentClass;
 use App\Traits\Authorable;
@@ -28,5 +29,10 @@ class Subject extends Model
     public function chapters()
     {
       return $this->hasMany(Chapter::class);
+    }
+
+    public function questions()
+    {
+      return $this->hasMany(Question::class);
     }
 }
