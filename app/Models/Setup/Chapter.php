@@ -14,10 +14,11 @@ class Chapter extends Model
     use HasFactory;
     use SoftDeletes;
     use Authorable;
-    protected $fillable = [ 'class_id', 'subject_id', 'name', 'description', 'note', 'active'];
+    protected $fillable = [ 'class_id', 'subject_id', 'name', 'description', 'note', 'active', 'is_free'];
 
     protected $casts = [
       'active' => 'boolean',
+      'is_free' => 'boolean'
     ];
 
     public function subject()

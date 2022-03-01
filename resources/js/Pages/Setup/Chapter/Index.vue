@@ -32,10 +32,13 @@
                             Chapter
                           </th>
                           <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Free Access
+                          </th>
+                          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Status
                           </th>
                           <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                             Note
+                            Admin Note
                           </th>
                           <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
                         </tr>
@@ -47,6 +50,10 @@
                               <div class="text-sm text-gray-900 text-lg">{{ chapter.name }}</div>
                               <div class="text-sm text-gray-500">{{ chapter.subject.student_class.name }}, {{ chapter.subject.name }}</div>
                             </Edit-link>
+                          </td>
+                          <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <lockOpen-icon v-if="chapter.is_free" />
+                            <lock-icon v-else />
                           </td>
                           <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                             <span v-if="chapter.active" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
@@ -85,11 +92,13 @@
     import Search from '@/Shared/Components/Filters/Search.vue'
     import SubjectAdd from '@/Shared/Components/Icons/svg/FolderAdd.vue'
     import { Link } from '@inertiajs/inertia-vue3';
+    import LockIcon from '@/Shared/Components/Icons/svg/Lock.vue'
+    import LockOpenIcon from '@/Shared/Components/Icons/svg/LockOpen.vue'
     // import AlertSuccess from '@/Shared/Components/Alerts/Pops/Success.vue'
 
     export default defineComponent({
         components: {
-          AdminLayout,BreadSimple, Search,AddLink,EditLink,Pagination,SubjectAdd,Link
+          AdminLayout,BreadSimple, Search,AddLink,EditLink,Pagination,SubjectAdd,Link,LockOpenIcon,LockIcon
         },
         props:{
             chapters: Object,

@@ -14,7 +14,7 @@ class ChapterController extends Controller
 
     public function index(Request $request)
     {
-        $chapters = Chapter::select('id', 'class_id', 'subject_id', 'name', 'note', 'active')
+        $chapters = Chapter::select('id', 'class_id', 'subject_id', 'name', 'note', 'active', 'is_free')
             ->with('subject:id,name,class_id', 'subject.studentClass:id,name')
             ->when($request->search, function ($query, $search){
                 $query->where('name', 'like', '%'. $search . '%');
@@ -37,7 +37,7 @@ class ChapterController extends Controller
     public function store(Request $request)
     {
         $this->validateFull($request);
-        Chapter::create($request->only('name', 'class_id', 'subject_id', 'description', 'note', 'active'));
+        Chapter::create($request->only('name', 'class_id', 'subject_id', 'description', 'note', 'active', 'is_free'));
         return redirect(route('chapter.index'))->with('type', 'success')->with('message', 'Chapter added successfully !!');
     }
 
@@ -51,14 +51,14 @@ class ChapterController extends Controller
     {
         $classes = StudentClass::select('id', 'name')->whereActive(1)->has('subjects')->get();
         $subjects = Subject::select('id', 'name', 'class_id')->whereActive(1)->get();
-        $chapter->load('subject:id,class_id' )->only('id','name', 'class_id', 'description','note', 'active', 'subject_id', 'subject');
+        $chapter->load('subject:id,class_id' )->only('id','name', 'class_id', 'description','note', 'active', 'subject_id', 'subject', 'is_free');
         return Inertia::render('Setup/Chapter/Create', compact('chapter', 'classes', 'subjects'));
     }
 
     public function update(Request $request, Chapter $chapter)
     {
         $this->validateFull($request);
-        $chapter->update($request->only('name',  'class_id', 'subject_id', 'description', 'note', 'active'));
+        $chapter->update($request->only('name',  'class_id', 'subject_id', 'description', 'note', 'active', 'is_free'));
         return redirect(route('chapter.index'))->with('type', 'success')->with('message', 'Chapter updated successfully !!');
     }
 

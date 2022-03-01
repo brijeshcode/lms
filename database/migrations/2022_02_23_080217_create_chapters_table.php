@@ -19,6 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('subject_id');
             $table->string('name');
             $table->text('description')->nullable();
+            $table->boolean('is_free')->default(false);
 
             $table->text('note')->nullable()->comment('additional information for this entry');
             $table->boolean('active')->default(true);
