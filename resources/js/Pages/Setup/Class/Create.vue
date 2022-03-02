@@ -32,7 +32,7 @@
                         </div>
 
                         <div>
-                            <form-label for="note" value="Note" />
+                            <form-label for="note" value="Admin Note" />
                             <form-text-area id="note" type="text" rows="3" class="mt-1 w-full" v-model="form.note" autocomplete="note" />
                             <input-error :message="form.errors.note" class="mt-2" />
                         </div>
@@ -98,9 +98,7 @@
 
         created(){
             if (this.studentclass) {
-                Object.keys(this.studentclass).forEach((index) => {
-                    this.form[index] = this.studentclass[index];
-                });
+                Object.keys(this.studentclass).forEach(index => this.form[index] = this.studentclass[index]);
                 this.edit = true;
             }
         },

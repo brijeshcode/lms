@@ -12,7 +12,7 @@ class StudentClassController extends Controller
 
     public function index(Request $request)
     {
-        $classes = StudentClass::select('id','name', 'note', 'active')
+        $classes = StudentClass::select('id','name', 'description', 'note', 'active')
             ->when($request->search, function ($query, $search){
                 $query->where('name', 'like', '%'. $search . '%');
                 // $query->orWhere('description', 'like', '%'. $search . '%');

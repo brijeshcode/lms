@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Quizzer\QuestionController;
 use App\Http\Controllers\Quizzer\QuizController;
+use App\Http\Controllers\Sale\PackageController;
 use App\Http\Controllers\Setup\ChapterController;
 use App\Http\Controllers\Setup\StudentClassController;
 use App\Http\Controllers\Setup\SubjectController;
@@ -45,4 +46,5 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     // quizzer
     Route::resource('/question', QuestionController::class)->except(['destroy']);
     Route::resource('/quiz', QuizController::class)->except(['destroy']);
+    Route::resource('/package', PackageController::class)->except(['destroy']);
 });

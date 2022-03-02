@@ -1,46 +1,67 @@
 <template>
-    <admin-layout title="Subject">
+    <admin-layout title="Package">
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Subject <span v-if="edit">Edit</span> <span v-else>Add</span>
+                Package <span v-if="edit">Edit</span> <span v-else>Add</span>
             </h2>
         </template>
 
         <template #breadcrum>
-            <bread-simple v-if="edit" :items="[ { route: 'subject.index'}, { name:'edit'} ]" />
-            <bread-simple v-else :items="[ { route: 'subject.index'}, {route: 'subject.create', name:'Add'} ]" />
+            <bread-simple v-if="edit" :items="[ { route: 'package.index'}, { name:'edit'} ]" />
+            <bread-simple v-else :items="[ { route: 'package.index'}, {route: 'package.create', name:'Add'} ]" />
         </template>
 
 
         <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
             <div class="p-2">
-                <form  @submit.prevent=" subject ? form.put(route('subject.update', subject.id)) : form.post(route('subject.store'))">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-4">
-
-                        <div class="control">
-                            <form-label for="class_id" required value="Class" />
-                            <select class="border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm mt-1 w-full " v-model="form.class_id">
-                                <option v-for="classin in classes" :value="classin.id">{{ classin.name }}</option>
-                            </select>
-                            <input-error :message="form.errors.class_id" class="mt-2" />
-                        </div>
-
-                    </div>
-
+                <form  @submit.prevent=" package ? form.put(route('package.update', package.id)) : form.post(route('package.store'))">
                     <div class="grid gird-cols-1 mb-4">
-                        <div class="control">
-                            <form-label for="name" required value="Name" />
-                            <form-input id="name" type="text" required class="mt-1 w-full" v-model="form.name" autocomplete="name" />
-                            <input-error :message="form.errors.name" class="mt-2" />
+                        <div>
+                            <form-label for="package-image" value="Image" />
+                            <input id="package-image" type="file" name="">
                         </div>
                     </div>
+                    <div class="grid grid-cols-1 gap-4 mb-4">
+
+                        <div class="control">
+                            <form-label for="title" required value="Title" />
+                            <form-input id="title" type="text" required class="mt-1 w-full" v-model="form.title" autocomplete="title" />
+                            <input-error :message="form.errors.title" class="mt-2" />
+                        </div>
+                    </div>
+
                     <div class="grid gird-cols-1 mb-4">
                         <div>
                             <form-label for="description" value="Description" />
                             <form-text-area id="description" type="text" rows="3" class="mt-1 w-full" v-model="form.description" autocomplete="description" />
                             <input-error :message="form.errors.description" class="mt-2" />
                         </div>
+                    </div>
 
+                    <div class="grid gird-cols-1 mb:grid-cols-5 lg:grid-cols-5 gap-4 mb-4">
+
+                        <div class="control" >
+                            <form-label for="is_free" required value="Free access" />
+                            <form-checkbox name="free" @click="form.regular_price = form.sell_price = 0 " v-model:checked="form.is_free" />
+                            <input-error :message="form.errors.is_free" class="mt-2" />
+                        </div>
+                        <div class="control" v-if="! form.is_free">
+                            <form-label for="regular_price" required value="Regular Price" />
+                            <form-input id="regular_price" type="number" min="0" setp="0.01" required class="mt-1 w-full" v-model="form.regular_price" autocomplete="regular_price" />
+                            <input-error :message="form.errors.regular_price" class="mt-2" />
+                        </div>
+
+                        <div class="control" v-if="! form.is_free">
+                            <form-label for="sell_price" required value="Sell Price" />
+                            <form-input id="sell_price" type="number" min="0" setp="0.01" required class="mt-1 w-full" v-model="form.sell_price" autocomplete="sell_price" />
+                            <input-error :message="form.errors.sell_price" class="mt-2" />
+                        </div>
+
+
+
+                    </div>
+
+                    <div class="grid gird-cols-1 mb-4">
                         <div>
                             <form-label for="note" value="Admin Note" />
                             <form-text-area id="note" type="text" rows="3" class="mt-1 w-full" v-model="form.note" autocomplete="note" />
@@ -91,25 +112,28 @@
             SimpleButton,
             FormCheckbox
         },
-        props: ['subject', 'classes'],
+        props: ['package'],
          data: () => ({
             edit: false,
 
          }),
         setup () {
             const form = useForm({
-              name: null,
+              title: null,
               description: null,
+              image: null,
+              regular_price: 0,
+              sell_price: 0,
+              is_free: false,
               note: null,
-              class_id: null,
               active: false
             })
             return { form  }
         },
 
         created(){
-            if (this.subject) {
-                Object.keys(this.subject).forEach(index =>  this.form[index] = this.subject[index]);
+            if (this.package) {
+                Object.keys(this.package).forEach(index => this.form[index] = this.package[index]);
                 this.edit = true;
             }
         },

@@ -1,20 +1,20 @@
 <template>
-    <admin-layout title="Subjects">
+    <admin-layout title="Packages">
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Subjects
-                <add-link createRoute="subject.create" isbutton >Add</add-link>
+                Packages
+                <add-link createRoute="package.create" isbutton >Add</add-link>
             </h2>
         </template>
 
         <template #breadcrum>
-            <bread-simple :items="[ { route: 'subject.index'} ]" />
+            <bread-simple :items="[ { route: 'package.index'} ]" />
         </template>
 
         <template #actions>
             <div class="flex">
-              <search searchRoute='subject.index' />
-              <Add-link createRoute="subject.create" withIcon  />
+              <search searchRoute='package.index' />
+              <Add-link createRoute="package.create" withIcon  />
             </div>
         </template>
 
@@ -32,7 +32,10 @@
                             Name
                           </th>
                           <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                             Class
+                            Price
+                          </th>
+                          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Description
                           </th>
                           <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Admin Note
@@ -41,32 +44,42 @@
                         </tr>
                       </thead>
                       <tbody class="bg-white divide-y divide-gray-200">
-                        <tr v-for="subject in subjects.data" :key="subject.id" class="hover:bg-gray-100">
+                        <tr v-for="salesPackage in packages.data" :key="salesPackage.id" class="hover:bg-gray-100">
                           <td class="px-4 py-4 whitespace-nowrap">
-                            <Edit-link :edit="{route: 'subject.edit', to:subject.id }"  >
-                              <div class="text-sm text-gray-900">{{ subject.name }}</div>
+                            <Edit-link :edit="{route: 'package.edit', to:salesPackage.id }"  >
+                              <div class="text-sm text-gray-900">{{ salesPackage.title }}</div>
                             </Edit-link>
-                            <span v-if="subject.active" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                            <lockOpen-icon class="inline w-4 h-4" v-if="salesPackage.is_free" />
+                            <lock-icon class="inline w-4 h-4" v-else />
+                            <span v-if="salesPackage.active" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                               Active
                             </span>
                             <span v-else class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
                               in-Active
                             </span>
                           </td>
+
                           <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                            <div class="text-sm text-gray-500">{{ subject.student_class.name }}</div>
+
+                            <div class="text-sm text-gray-500" v-if="salesPackage.sell_price > 0">
+                              <span class="inline-block"> <rupee-icon class="inline w-4 h-4" />{{ salesPackage.sell_price }}</span> <span class="line-through">{{ salesPackage.regular_price }}</span> </div>
+                            <div class="text-sm text-gray-500" v-else><rupee-icon class="inline w-4 h-4"  />{{ salesPackage.regular_price }}</div>
+                          </td>
+
+                          <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <div class="text-sm text-gray-500">{{ salesPackage.description }}</div>
                           </td>
                           <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                            <div class="text-sm text-gray-500">{{ subject.note }}</div>
+                            <div class="text-sm text-gray-500">{{ salesPackage.note }}</div>
                           </td>
                           <td  class="px-4 py-4 whitespace-nowrap  text-sm flex justify-end text-right  font-medium">
-                           <!--  <Link :href="route('subject.create')" title="Add subject" class="text-green-600" ><subject-add /></Link> -->
-                            <Edit-link  :edit="{route: 'subject.edit', to:subject.id }" showicon />
+                            <!-- <Link :href="route('subject.create')" title="Add subject" class="text-green-600" ><subject-add /></Link> -->
+                            <Edit-link  :edit="{route: 'package.edit', to:salesPackage.id }" showicon />
                           </td>
                         </tr>
                       </tbody>
                     </table>
-                    <Pagination :pageData="subjects" pageof=" Subjects" />
+                    <Pagination :pageData="packages" pageof=" Classes" />
                   </div>
                 </div>
               </div>
@@ -85,14 +98,16 @@
     import Search from '@/Shared/Components/Filters/Search.vue'
     import SubjectAdd from '@/Shared/Components/Icons/svg/FolderAdd.vue'
     import { Link } from '@inertiajs/inertia-vue3';
-    // import AlertSuccess from '@/Shared/Components/Alerts/Pops/Success.vue'
+    import LockIcon from '@/Shared/Components/Icons/svg/Lock.vue'
+    import LockOpenIcon from '@/Shared/Components/Icons/svg/LockOpen.vue'
+    import RupeeIcon from '@/Shared/Components/Icons/svg/Rupee.vue'
 
     export default defineComponent({
         components: {
-          AdminLayout,BreadSimple, Search,AddLink,EditLink,Pagination,SubjectAdd,Link
+          AdminLayout,BreadSimple, Search,AddLink,EditLink,Pagination,SubjectAdd,Link,LockOpenIcon,LockIcon,RupeeIcon
         },
         props:{
-            subjects: Object,
+            packages: Object,
         }
     })
 </script>

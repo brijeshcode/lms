@@ -57,7 +57,7 @@
                         </div>
 
                         <div>
-                            <form-label for="note" value="Note" />
+                            <form-label for="note" value="Admin Note" />
                             <form-text-area id="note" type="text" rows="3" class="mt-1 w-full" v-model="form.note" autocomplete="note" />
                             <input-error :message="form.errors.note" class="mt-2" />
                         </div>
@@ -127,9 +127,7 @@
 
         created(){
             if (this.chapter) {
-                Object.keys(this.chapter).forEach((index) => {
-                    this.form[index] = this.chapter[index];
-                });
+                Object.keys(this.chapter).forEach(index => this.form[index] = this.chapter[index]);
                 this.subjects.forEach(subject =>{
                     if (subject.class_id == this.chapter.subject.class_id) {this.class_subjects.push(subject);}
                 });
