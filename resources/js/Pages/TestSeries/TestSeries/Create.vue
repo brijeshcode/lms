@@ -1,20 +1,20 @@
 <template>
-    <admin-layout title="Quiz">
+    <admin-layout title="Test Series">
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Quiz <span v-if="edit">Edit</span> <span v-else>Add</span>
+                Test Series <span v-if="edit">Edit</span> <span v-else>Add</span>
             </h2>
         </template>
 
         <template #breadcrum>
-            <bread-simple v-if="edit" :items="[ { route: 'quiz.index'}, { name:'edit'} ]" />
-            <bread-simple v-else :items="[ { route: 'quiz.index'}, {route: 'quiz.create', name:'Add'} ]" />
+            <bread-simple v-if="edit" :items="[ { route: 'testseries.index'}, { name:'edit'} ]" />
+            <bread-simple v-else :items="[ { route: 'testseries.index'}, {route: 'testseries.create', name:'Add'} ]" />
         </template>
 
 
         <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
             <div class="p-2">
-                <form @submit.prevent=" quiz ? form.put(route('quiz.update', quiz.id)) : form.post(route('quiz.store'))">
+                <form @submit.prevent=" testseries ? form.put(route('testseries.update', testseries.id)) : form.post(route('testseries.store'))">
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-4">
 
                         <div class="control">
@@ -56,7 +56,7 @@
 
                     <div class="grid gird-cols-1 gap-4 mb-4">
                         <div class="control">
-                            <form-label for="title" required value="Quiz Title" />
+                            <form-label for="title" required value="Test Series Title" />
                             <form-input id="title" type="text" required class="mt-1 w-full" v-model="form.title" autocomplete="title" />
                             <input-error :message="form.errors.title" class="mt-2" />
                         </div>
@@ -81,7 +81,7 @@
                             <div class="col-span-8 ">
                                 <form-label :for="'question_id'+ index" required value="Question" />
                                 <select class="border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm mt-1 w-full" :id="'question_id'+ index" required v-model="question.question_id">
-                                    <option v-for="quiz in quiz_questions" :value="quiz.id">{{ quiz.title }}</option>
+                                    <option v-for="testseries in testseries_questions" :value="testseries.id">{{ testseries.title }}</option>
                                 </select>
                                 <input-error :message="form.errors['questions.'+index+'.question_id']" class="mt-2" />
                             </div>
@@ -161,12 +161,12 @@
             plusIcon,
             trashIcon
         },
-        props: ['quiz', 'classes', 'subjects', 'chapters','questions'],
+        props: ['testseries', 'classes', 'subjects', 'chapters','questions'],
          data: () => ({
             edit: false,
             class_subjects: [],
             subject_chapters: [],
-            quiz_questions : []
+            testseries_questions : []
 
          }),
         setup () {
@@ -187,9 +187,9 @@
         },
 
         created(){
-            if (this.quiz) {
-                Object.keys(this.quiz).forEach((index) => {
-                    this.form[index] = this.quiz[index];
+            if (this.testseries) {
+                Object.keys(this.testseries).forEach((index) => {
+                    this.form[index] = this.testseries[index];
                 });
                 this.classSubject(this.form.class_id);
                 this.subjectChapter(this.form.subject_id);
@@ -223,23 +223,23 @@
 
             /*chapterQuestion(chapter_id){
 
-                this.quiz_questions = [];
+                this.testseries_questions = [];
                 this.questions.forEach(question => {
-                   if (question.chapter_id == chapter_id) {this.quiz_questions.push(question)};
+                   if (question.chapter_id == chapter_id) {this.testseries_questions.push(question)};
                 });
             },*/
 
             subjectQuestion(subject_id){
 
-                this.quiz_questions = [];
+                this.testseries_questions = [];
                 this.questions.forEach(question => {
-                   if (question.subject_id == subject_id) {this.quiz_questions.push(question)};
+                   if (question.subject_id == subject_id) {this.testseries_questions.push(question)};
                 });
-                if(this.quiz_questions.length == 0){alert('This subject dont have any questions.')}
+                if(this.testseries_questions.length == 0){alert('This subject dont have any questions.')}
             },
 
             addQuestions(){
-                if (this.quiz_questions.length == 0) { alert('Select quiz subject.') ;return ; }
+                if (this.testseries_questions.length == 0) { alert('Select testseries subject.') ;return ; }
                 this.form.questions.push({
                     question_index:null,
                     question_id: null,

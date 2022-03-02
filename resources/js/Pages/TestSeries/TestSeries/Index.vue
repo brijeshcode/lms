@@ -1,20 +1,20 @@
 <template>
-    <admin-layout title="Quiz">
+    <admin-layout title="TestSeries">
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Quiz
-                <add-link createRoute="quiz.create" isbutton >Add</add-link>
+                TestSeries
+                <add-link createRoute="testseries.create" isbutton >Add</add-link>
             </h2>
         </template>
 
         <template #breadcrum>
-            <bread-simple :items="[ { route: 'quiz.index'} ]" />
+            <bread-simple :items="[ { route: 'testseries.index'} ]" />
         </template>
 
         <template #actions>
             <div class="flex">
-              <search searchRoute='quiz.index' />
-              <Add-link createRoute="quiz.create" withIcon  />
+              <search searchRoute='testseries.index' />
+              <Add-link createRoute="testseries.create" withIcon  />
             </div>
         </template>
 
@@ -29,7 +29,7 @@
                       <thead class="bg-gray-50">
                         <tr>
                           <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Quiz
+                            TestSeries
                           </th>
                           <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Detail
@@ -44,12 +44,12 @@
                         </tr>
                       </thead>
                       <tbody class="bg-white divide-y divide-gray-200">
-                        <tr v-for="quiz in quizzes.data" :key="quiz.id" class="hover:bg-gray-100">
+                        <tr v-for="testseries in testseries.data" :key="testseries.id" class="hover:bg-gray-100">
                           <td class="px-4 py-4 whitespace-nowrap">
-                            <Edit-link :edit="{route: 'quiz.edit', to:quiz.id }"  >
-                              <div class="text-sm text-gray-900">{{ quiz.title }}</div>
+                            <Edit-link :edit="{route: 'testseries.edit', to:testseries.id }"  >
+                              <div class="text-sm text-gray-900">{{ testseries.title }}</div>
                             </Edit-link>
-                            <span v-if="quiz.active" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                            <span v-if="testseries.active" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                               Active
                             </span>
                             <span v-else class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
@@ -57,23 +57,23 @@
                             </span>
                           </td>
                           <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                            <div class="text-sm text-gray-900">{{ quiz.chapter.name }}</div>
-                            <div class="text-sm text-gray-500">{{ quiz.st_class.name }}, {{ quiz.subject.name }}</div>
+                            <div class="text-sm text-gray-900">{{ testseries.chapter.name }}</div>
+                            <div class="text-sm text-gray-500">{{ testseries.st_class.name }}, {{ testseries.subject.name }}</div>
                           </td>
                           <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                            <div class="text-sm text-gray-500">{{ quiz.time_duration }}</div>
+                            <div class="text-sm text-gray-500">{{ testseries.time_duration }}</div>
                           </td>
                           <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                            <div class="text-sm text-gray-500">{{ quiz.note }}</div>
+                            <div class="text-sm text-gray-500">{{ testseries.note }}</div>
                           </td>
                           <td  class="px-4 py-4 whitespace-nowrap  text-sm flex justify-end text-right  font-medium">
-                            <!-- <Link :href="route('quiz.create')" title="Add subject" class="text-green-600" ><subject-add /></Link> -->
-                            <Edit-link  :edit="{route: 'quiz.edit', to:quiz.id }" showicon />
+                            <!-- <Link :href="route('testseries.create')" title="Add subject" class="text-green-600" ><subject-add /></Link> -->
+                            <Edit-link  :edit="{route: 'testseries.edit', to:testseries.id }" showicon />
                           </td>
                         </tr>
                       </tbody>
                     </table>
-                    <Pagination :pageData="quizzes" pageof=" Quiz" />
+                    <Pagination :pageData="testseries" pageof=" TestSeries" />
                   </div>
                 </div>
               </div>
@@ -98,7 +98,7 @@
           AdminLayout,BreadSimple, Search,AddLink,EditLink,Pagination,SubjectAdd,Link
         },
         props:{
-            quizzes: Object,
+            testseries: Object,
         }
     })
 </script>

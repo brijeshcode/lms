@@ -17,12 +17,11 @@
                 <form  @submit.prevent=" package ? form.put(route('package.update', package.id)) : form.post(route('package.store'))">
                     <div class="grid gird-cols-1 mb-4">
                         <div>
-                            <form-label for="package-image" value="Image" />
-                            <input id="package-image" type="file" name="">
+                            <form-label for="package-image" value="Thumbnail Image" />
+                            <input id="package-image"  type="file" accept="image/png, image/jpeg" name="">
                         </div>
                     </div>
                     <div class="grid grid-cols-1 gap-4 mb-4">
-
                         <div class="control">
                             <form-label for="title" required value="Title" />
                             <form-input id="title" type="text" required class="mt-1 w-full" v-model="form.title" autocomplete="title" />
@@ -33,7 +32,7 @@
                     <div class="grid gird-cols-1 mb-4">
                         <div>
                             <form-label for="description" value="Description" />
-                            <form-text-area id="description" type="text" rows="3" class="mt-1 w-full" v-model="form.description" autocomplete="description" />
+                            <form-text-area id="description" type="text" rows="3" class="mt-1 w-full" v-model.trim="form.description" autocomplete="description" />
                             <input-error :message="form.errors.description" class="mt-2" />
                         </div>
                     </div>
@@ -41,13 +40,13 @@
                     <div class="grid gird-cols-1 mb:grid-cols-5 lg:grid-cols-5 gap-4 mb-4">
 
                         <div class="control" >
-                            <form-label for="is_free" required value="Free access" />
+                            <form-label for="is_free" value="Free access" />
                             <form-checkbox name="free" @click="form.regular_price = form.sell_price = 0 " v-model:checked="form.is_free" />
                             <input-error :message="form.errors.is_free" class="mt-2" />
                         </div>
                         <div class="control" v-if="! form.is_free">
                             <form-label for="regular_price" required value="Regular Price" />
-                            <form-input id="regular_price" type="number" min="0" setp="0.01" required class="mt-1 w-full" v-model="form.regular_price" autocomplete="regular_price" />
+                            <form-input id="regular_price" type="number" min="0" setp="0.01" required class="mt-1 w-full" v-model.change.number="form.regular_price" autocomplete="regular_price" />
                             <input-error :message="form.errors.regular_price" class="mt-2" />
                         </div>
 
@@ -58,6 +57,28 @@
                         </div>
 
 
+
+                    </div>
+
+
+                    <div class="grid gird-cols-1 mb:grid-cols-5 lg:grid-cols-5 gap-4 mb-4">
+
+                        <div class="control" >
+                            <form-label for="access_forever" value="Access Forever" />
+                            <form-checkbox name="access_forever" @click="form.end = null " v-model:checked="form.access_forever" />
+                            <input-error :message="form.errors.access_forever" class="mt-2" />
+                        </div>
+                        <div class="control">
+                            <form-label for="start" required value="Package Start From " />
+                            <form-input id="start" type="date" required class="mt-1 w-full" v-model="form.start" autocomplete="start" />
+                            <input-error :message="form.errors.start" class="mt-2" />
+                        </div>
+
+                        <div class="control" v-if="! form.access_forever">
+                            <form-label for="end" value="Package End To" />
+                            <form-input id="end" type="date"  class="mt-1 w-full" v-model="form.end" autocomplete="end" />
+                            <input-error :message="form.errors.end" class="mt-2" />
+                        </div>
 
                     </div>
 
@@ -115,11 +136,12 @@
         props: ['package'],
          data: () => ({
             edit: false,
-
          }),
         setup () {
             const form = useForm({
               title: null,
+              start: new Date().toISOString().slice(0,10),
+              end: null,
               description: null,
               image: null,
               regular_price: 0,

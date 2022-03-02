@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Models\Quizzer;
+namespace App\Models\TestSeries;
 
-use App\Models\Quizzer\Option;
+use App\Models\TestSeries\Option;
 use App\Models\Setup\Chapter;
 use App\Models\Setup\StudentClass;
 use App\Models\Setup\Subject;

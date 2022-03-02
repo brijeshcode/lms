@@ -2,7 +2,7 @@
 
 namespace App\Models\Setup;
 
-use App\Models\Quizzer\Question;
+use App\Models\TestSeries\Question;
 use App\Models\Setup\Chapter;
 use App\Models\Setup\Subject;
 use App\Traits\Authorable;

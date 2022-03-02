@@ -13,18 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('packages', function (Blueprint $table) {
+        Schema::create('live_classes', function (Blueprint $table) {
             $table->id();
             $table->string('title')->comment('package name');
             $table->text('description')->nullable();
             $table->string('image')->nullable();
-            $table->double('regular_price')->default(0);
-            $table->double('sell_price')->default(0);
-            $table->boolean('is_free')->default(false);
-
-            $table->date('start')->comment('package start from date')->nullable();
-            $table->date('end')->comment('package end date')->nullable();
-            $table->boolean('access_forever')->default(false);
 
             $table->text('note')->nullable()->comment('additional information for this entry');
             $table->boolean('active')->default(true);
@@ -43,6 +36,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('packages');
+        Schema::dropIfExists('live_classes');
     }
 };

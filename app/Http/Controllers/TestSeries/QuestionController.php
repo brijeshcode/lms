@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\Quizzer;
+namespace App\Http\Controllers\TestSeries;
 
 use App\Http\Controllers\Controller;
-use App\Models\Quizzer\Option;
-use App\Models\Quizzer\Question;
+use App\Models\TestSeries\Option;
+use App\Models\TestSeries\Question;
 use App\Models\Setup\Chapter;
 use App\Models\Setup\StudentClass;
 use App\Models\Setup\Subject;
@@ -26,7 +26,7 @@ class QuestionController extends Controller
             ->paginate(10)
             ->withQueryString()
             ;
-        return Inertia::render('Quizzer/Question/Index' , compact('questions'));
+        return Inertia::render('TestSeries/Question/Index' , compact('questions'));
     }
 
     public function create()
@@ -34,7 +34,7 @@ class QuestionController extends Controller
         $classes = StudentClass::whereActive(1)->has('chapters')->get();
         $subjects = Subject::whereActive(1)->has('chapters')->get();
         $chapters = Chapter::whereActive(1)->get();
-        return Inertia::render('Quizzer/Question/Create', compact('classes', 'subjects', 'chapters'));
+        return Inertia::render('TestSeries/Question/Create', compact('classes', 'subjects', 'chapters'));
     }
 
     public function store(Request $request)
@@ -64,7 +64,7 @@ class QuestionController extends Controller
         $subjects = Subject::select('id', 'name', 'class_id')->has('chapters')->whereActive(1)->get();
         $chapters = Chapter::whereActive(1)->get();
         $question->load('options:id,question_id,option_number,option,is_correct,explanation')->only('id', 'class_id', 'subject_id', 'chapter_id', 'title','body', 'note', 'active', 'options');
-        return Inertia::render('Quizzer/Question/Create', compact('question', 'classes','subjects', 'chapters'));
+        return Inertia::render('TestSeries/Question/Create', compact('question', 'classes','subjects', 'chapters'));
     }
 
     public function update(Request $request, Question $question)

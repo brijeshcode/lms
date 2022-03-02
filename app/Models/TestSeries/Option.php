@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Models\Quizzer;
+namespace App\Models\TestSeries;
 
-use App\Models\Quizzer\Question;
+use App\Models\TestSeries\Question;
 use App\Traits\Authorable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

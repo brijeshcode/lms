@@ -1,12 +1,12 @@
 <?php
 
-use App\Http\Controllers\Quizzer\QuestionController;
-use App\Http\Controllers\Quizzer\QuizController;
 use App\Http\Controllers\Sale\PackageController;
 use App\Http\Controllers\Setup\ChapterController;
 use App\Http\Controllers\Setup\StudentClassController;
 use App\Http\Controllers\Setup\SubjectController;
 use App\Http\Controllers\Setup\TopicController;
+use App\Http\Controllers\TestSeries\QuestionController;
+use App\Http\Controllers\TestSeries\TestSeriesController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -43,8 +43,8 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::resource('/chapter', ChapterController::class)->except(['destroy']);
     Route::resource('/topic', TopicController::class)->except(['destroy']);
 
-    // quizzer
+    // testserieszer
     Route::resource('/question', QuestionController::class)->except(['destroy']);
-    Route::resource('/quiz', QuizController::class)->except(['destroy']);
+    Route::resource('/testseries', TestSeriesController::class)->except(['destroy']);
     Route::resource('/package', PackageController::class)->except(['destroy']);
 });

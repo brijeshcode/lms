@@ -1,22 +1,22 @@
 <?php
 
-namespace App\Http\Controllers\Quizzer;
+namespace App\Http\Controllers\TestSeries;
 
 use App\Http\Controllers\Controller;
-use App\Models\Quizzer\Question;
-use App\Models\Quizzer\Quiz;
-use App\Models\Quizzer\QuizQuestion;
 use App\Models\Setup\Chapter;
 use App\Models\Setup\StudentClass;
 use App\Models\Setup\Subject;
+use App\Models\TestSeries\Question;
+use App\Models\TestSeries\TestSeries;
+use App\Models\TestSeries\TestSeriesQuestion;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class QuizController extends Controller
+class TestSeriesController extends Controller
 {
     public function index(Request $request)
     {
-        $quizzes = Quiz::select('id', 'class_id', 'subject_id', 'chapter_id', 'title', 'note', 'active', 'time_duration','display_instant_result')
+        $testseries = TestSeries::select('id', 'class_id', 'subject_id', 'chapter_id', 'title', 'note', 'active', 'time_duration','display_instant_result')
         ->with('chapter:id,name', 'stClass:id,name', 'subject:id,name')
             ->when($request->search, function ($query, $search){
                 $query->where('title', 'like', '%'. $search . '%');
@@ -27,7 +27,7 @@ class QuizController extends Controller
             ->paginate(10)
             ->withQueryString()
             ;
-        return Inertia::render('Quizzer/Quiz/Index' , compact('quizzes'));
+        return Inertia::render('TestSeries/TestSeries/Index' , compact('testseries'));
     }
 
     public function create()
@@ -36,16 +36,16 @@ class QuizController extends Controller
         $subjects = Subject::select('id', 'name', 'class_id')->whereActive(1)->has('questions')->get();
         $chapters = Chapter::select('id','name','subject_id')->whereActive(1)->has('questions')->get();
         $questions = Question::select('id','title','subject_id')->whereActive(1)->get();
-        return Inertia::render('Quizzer/Quiz/Create', compact('classes', 'subjects', 'chapters', 'questions'));
+        return Inertia::render('TestSeries/TestSeries/Create', compact('classes', 'subjects', 'chapters', 'questions'));
     }
 
     public function store(Request $request)
     {
         $this->validateFull($request);
         \DB::transaction(function() use ($request) {
-            Quiz::create($request->only( 'class_id', 'subject_id', 'chapter_id', 'title', 'body', 'display_instant_result', 'time_duration', 'note', 'active'))->questions()->createMany($request->questions);
+            TestSeries::create($request->only( 'class_id', 'subject_id', 'chapter_id', 'title', 'body', 'display_instant_result', 'time_duration', 'note', 'active'))->questions()->createMany($request->questions);
         });
-        return redirect(route('quiz.index'))->with('type', 'success')->with('message', 'Quiz added successfully !!');
+        return redirect(route('testseries.index'))->with('type', 'success')->with('message', 'TestSeries added successfully !!');
     }
 
     /**
@@ -60,47 +60,45 @@ class QuizController extends Controller
     }
 
 
-    public function edit(Quiz $quiz)
+    public function edit(TestSeries $testseries)
     {
         $classes = StudentClass::select('id', 'name')->whereActive(1)->has('subjects')->has('chapters')->get();
         $subjects = Subject::select('id', 'name', 'class_id')->whereActive(1)->has('chapters')->get();
         $chapters = Chapter::select('id','name','subject_id')->whereActive(1)->get();
         $questions = Question::select('id','title','subject_id')->whereActive(1)->get();
-        $quiz->load('questions:id,question_id,quiz_id,question_index,positive_mark,negative_mark')->only('id', 'class_id', 'subject_id', 'chapter_id', 'title','body', 'note', 'active', 'questions');
-        return Inertia::render('Quizzer/Quiz/Create', compact('quiz', 'classes','subjects', 'chapters', 'questions'));
+        $testseries->load('questions:id,question_id,test_series_id,question_index,positive_mark,negative_mark')->only('id', 'class_id', 'subject_id', 'chapter_id', 'title','body', 'note', 'active', 'questions');
+        return Inertia::render('TestSeries/TestSeries/Create', compact('testseries', 'classes','subjects', 'chapters', 'questions'));
     }
 
-    public function update(Request $request, Quiz $quiz)
+    public function update(Request $request, TestSeries $testseries)
     {
         $this->validateFull($request);
 
-        \DB::transaction(function() use ($request, $quiz) {
+        \DB::transaction(function() use ($request, $testseries) {
 
             // update existing questions
             $currentItems = collect($request->questions)->where('id', '!=', '');
-            $currentItems->map(function ($quizQuestion){
-                QuizQuestion::whereId($quizQuestion['id'])
-                    ->update(collect($quizQuestion)
+            $currentItems->map(function ($testseriesQuestion){
+                TestSeriesQuestion::whereId($testseriesQuestion['id'])
+                    ->update(collect($testseriesQuestion)
                         ->only('question_index', 'question_id', 'positive_mark', 'negative_mark')
                         ->toArray()
                     );
             });
 
             // delete removed questions
-            $quiz->questions()->whereNotIn('id', $currentItems->pluck('id'))->delete();
+            $testseries->questions()->whereNotIn('id', $currentItems->pluck('id'))->delete();
             // create new questions
-            $quiz->questions()->createMany(collect($request->questions)->where('id' ,'' ));
+            $testseries->questions()->createMany(collect($request->questions)->where('id' ,'' ));
 
-            $quiz->update($request->only('class_id', 'subject_id', 'chapter_id', 'title', 'body', 'display_instant_result', 'time_duration', 'note', 'active'));
+            $testseries->update($request->only('class_id', 'subject_id', 'chapter_id', 'title', 'body', 'display_instant_result', 'time_duration', 'note', 'active'));
         });
-        return redirect(route('quiz.index'))->with('type', 'success')->with('message', 'Quiz updated successfully !!');
+        return redirect(route('testseries.index'))->with('type', 'success')->with('message', 'TestSeries updated successfully !!');
     }
 
 
     private function validateFull($request)
     {
-        // dd($request->all());
-        $tempName = 'Quesiton';
         $request->validate(
             [
                 'title' => 'required|min:4',

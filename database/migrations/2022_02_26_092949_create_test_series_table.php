@@ -13,8 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('quizzes', function (Blueprint $table) {
-            $table->id();
+        Schema::create('test_series', function (Blueprint $table) {$table->id();
 
             $table->unsignedBigInteger('class_id');
             $table->unsignedBigInteger('subject_id');
@@ -32,8 +31,7 @@ return new class extends Migration
             $table->ipAddress('user_ip')->default('127.0.0.1');
 
             $table->softDeletes();
-            $table->timestamps();
-        });
+            $table->timestamps();});
     }
 
     /**
@@ -43,6 +41,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('quizzes');
+        Schema::dropIfExists('test_series');
     }
 };

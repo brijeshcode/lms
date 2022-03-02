@@ -13,7 +13,7 @@ class PackageController extends Controller
 {
     public function index(Request $request)
     {
-        $packages = Package::select('id','title', 'description', 'image', 'regular_price', 'sell_price', 'is_free', 'note', 'active')
+        $packages = Package::select('id','title', 'description', 'image', 'regular_price', 'sell_price', 'start', 'end', 'is_free', 'note', 'active')
             ->when($request->search, function ($query, $search){
                 $query->where('title', 'like', '%'. $search . '%');
                 $query->orWhere('description', 'like', '%'. $search . '%');
@@ -39,13 +39,14 @@ class PackageController extends Controller
     {
         $this->validateFull($request);
         \DB::transaction(function() use ($request) {
-            Package::create($request->only('title', 'description', 'image', 'regular_price', 'sell_price', 'is_free', 'note', 'active'));
+            Package::create($request->only('title', 'description', 'image',  'start', 'end', 'regular_price', 'sell_price', 'is_free', 'note', 'active'));
         });
         return redirect(route('package.index'))->with('type', 'success')->with('message', 'Package added successfully !!');
     }
 
     public function edit(Package $package)
     {
+
         $classes = StudentClass::select('id', 'name')->whereActive(1)->has('subjects')->get();
         $subjects = Subject::select('id', 'name', 'class_id')->whereActive(1)->get();
         return Inertia::render('Sale/Package/Create', compact('classes', 'subjects', 'package'));
@@ -54,19 +55,20 @@ class PackageController extends Controller
     public function update(Request $request, Package $package)
     {
         $this->validateFull($request);
-        $package->update($request->only('title', 'description', 'image', 'regular_price', 'sell_price', 'is_free', 'note', 'active'));
+        $package->update($request->only('title', 'description', 'image','start', 'end', 'regular_price', 'sell_price', 'is_free', 'note', 'active'));
         return redirect(route('package.index'))->with('type', 'success')->with('message', 'Package updated successfully !!');
     }
 
     private function validateFull($request)
     {
-        // dd($request->all());
         $tempName = 'Package';
         $request->validate(
             [
                 'title' => 'required|min:4',
                 'regular_price' => "required|numeric|min:0",
                 'sell_price' => "required|numeric|min:0|lte:regular_price",
+                'start' =>  'required|date',
+                'end' =>  'after:start',
                 /*'class_id' => 'required',
                 'subject_id' => 'required',
                 'chapter_id' => 'required',
@@ -85,6 +87,8 @@ class PackageController extends Controller
                 'sell_price.numeric' => ' Sell Price must be a number.',
                 'sell_price.min' => ' Sell Price should be zero or greater.',
                 'sell_price.lte' => ' Sell Price cannot be greater then Regular price.',
+                'start.required' => 'Start package date required',
+                'end.after' => 'End should be after Start',
 
                 /*'class_id.required' => 'The class field is required.',
                 'subject_id.required' => 'The subject field is required.',

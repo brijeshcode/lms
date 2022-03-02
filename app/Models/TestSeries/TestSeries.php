@@ -1,18 +1,19 @@
 <?php
 
-namespace App\Models\Quizzer;
+namespace App\Models\TestSeries;
 
-use App\Models\Quizzer\QuizQuestion;
 use App\Models\Setup\Chapter;
 use App\Models\Setup\StudentClass;
 use App\Models\Setup\Subject;
 use App\Models\Setup\Topic;
+use App\Models\TestSeries\TestSeriesQuestion;
 use App\Traits\Authorable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Quiz extends Model
+
+class TestSeries extends Model
 {
     use HasFactory;
     use SoftDeletes;
@@ -25,7 +26,7 @@ class Quiz extends Model
     ];
 
     public function questions(){
-      return $this->hasMany(QuizQuestion::class);
+      return $this->hasMany(TestSeriesQuestion::class);
     }
 
     public function stClass()
