@@ -55,15 +55,15 @@
                             <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                                 <jet-dropdown align="left" width="48">
                                     <template #trigger>
-                                           <div class="items-center py-6 cursor-pointer text-sm font-medium leading-5 text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition">live Classes</div>
+                                           <div class="items-center py-6 cursor-pointer text-sm font-medium leading-5 text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition">Live Classes</div>
                                     </template>
 
                                     <template #content>
 
-                                        <jet-dropdown-link :href="route('testseries.index')">
+                                        <jet-dropdown-link :href="route('liveClass.index')">
                                             List
                                         </jet-dropdown-link>
-                                        <jet-dropdown-link :href="route('question.index')">
+                                        <jet-dropdown-link :href="route('liveSession.index')">
                                             Sessions
                                         </jet-dropdown-link>
                                     </template>

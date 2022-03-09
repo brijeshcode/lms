@@ -13,18 +13,14 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('live_classes', function (Blueprint $table) {
+        Schema::create('live_sessions', function (Blueprint $table) {
             $table->id();
 
-            $table->unsignedBigInteger('class_id');
-            $table->unsignedBigInteger('subject_id');
-            $table->unsignedBigInteger('chapter_id')->nullable();
-            $table->unsignedBigInteger('topic_id')->nullable();
-
-
-            $table->string('title')->comment('Live class name');
-            $table->text('description')->nullable();
-            $table->string('image')->nullable();
+            $table->unsignedBigInteger('live_class_id');
+            $table->date('date');
+            $table->string('timing');
+            $table->string('link')->comment('session link for live class');
+            $table->string('description')->nullable()->comment('instructions or any other informations for live classes');
 
             $table->text('note')->nullable()->comment('additional information for this entry');
             $table->boolean('active')->default(true);
@@ -43,6 +39,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('live_classes');
+        Schema::dropIfExists('live_sessions');
     }
 };

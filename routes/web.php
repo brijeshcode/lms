@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\LiveClasses\LiveClassController;
+use App\Http\Controllers\LiveClasses\LiveSessionController;
 use App\Http\Controllers\Sale\PackageController;
 use App\Http\Controllers\Setup\ChapterController;
 use App\Http\Controllers\Setup\StudentClassController;
@@ -46,5 +48,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     // testserieszer
     Route::resource('/question', QuestionController::class)->except(['destroy']);
     Route::resource('/testseries', TestSeriesController::class)->except(['destroy']);
+    Route::resource('/liveClass', LiveClassController::class)->except(['destroy']);
+    Route::resource('/liveSession', LiveSessionController::class)->except(['destroy']);
     Route::resource('/package', PackageController::class)->except(['destroy']);
 });
