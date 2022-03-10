@@ -49,7 +49,7 @@
 
                         <div>
                             <form-label for="display_instant_result" required value="Display Instant Result" />
-                            <form-input id="display_instant_result" type="text" class="mt-1 w-full" v-model="form.display_instant_result" autocomplete="display_instant_result" />
+                                <form-checkbox name="active" v-model:checked="form.display_instant_result" />
                             <input-error :message="form.errors.display_instant_result" class="mt-2" />
                         </div>
                     </div>
@@ -88,13 +88,13 @@
 
                             <div>
                                 <form-label :for="'positive_mark_'+ index" class="text-green-500" required value=" + Marks" />
-                                <form-input :id="'positive_mark_'+ index" type="text" class="mt-1 w-full" v-model="question.positive_mark" autocomplete="positive_mark" />
+                                <form-input :id="'positive_mark_'+ index" type="number" class="mt-1 w-full" v-model="question.positive_mark" autocomplete="positive_mark" />
                                 <input-error :message="form.errors['questions.'+index+'.positive_mark']" class="mt-2" />
                             </div>
 
                             <div>
                                 <form-label :for="'negative_mark_'+ index" required class="text-red-500"  value=" - Marks" />
-                                <form-input :id="'negative_mark_'+ index" type="text" class="mt-1 w-full" v-model="question.negative_mark" autocomplete="negative_mark" />
+                                <form-input :id="'negative_mark_'+ index" type="number" class="mt-1 w-full" v-model="question.negative_mark" autocomplete="negative_mark" />
                                 <input-error :message="form.errors['questions.'+index+'.negative_mark']" class="mt-2" />
                             </div>
 
@@ -192,8 +192,8 @@
                     this.form[index] = this.testseries[index];
                 });
                 this.classSubject(this.form.class_id);
-                this.subjectChapter(this.form.subject_id);
-                this.subjectQuestion(this.form.subject_id);
+                this.subjectChapters(this.form.subject_id);
+                this.subjectQuestions(this.form.subject_id);
                 this.edit = true;
             }
         },
@@ -202,23 +202,16 @@
                 this.classSubject(event.target.value);
             },
             subjectChange(event){
-                this.subjectChapter(event.target.value);
-                this.subjectQuestion(event.target.value);
+                this.subjectChapters(event.target.value);
+                this.subjectQuestions(event.target.value);
             },
 
             classSubject(class_id){
-                this.class_subjects = [];
                 this.subject_chapters = [];
-                this.subjects.forEach(subject =>{
-                    if (subject.class_id == class_id) {this.class_subjects.push(subject);}
-                });
+                this.class_subjects = this.subjects.filter(subject => subject.class_id == class_id);
             },
-            subjectChapter(subject_id){
-
-                this.subject_chapters = [];
-                this.chapters.forEach(chapter => {
-                   if (chapter.subject_id == subject_id) {this.subject_chapters.push(chapter)};
-                });
+            subjectChapters(subject_id){
+                this.subject_chapters = this.chapters.filter(chapter => chapter.subject_id == subject_id);
             },
 
             /*chapterQuestion(chapter_id){
@@ -229,12 +222,9 @@
                 });
             },*/
 
-            subjectQuestion(subject_id){
+            subjectQuestions(subject_id){
 
-                this.testseries_questions = [];
-                this.questions.forEach(question => {
-                   if (question.subject_id == subject_id) {this.testseries_questions.push(question)};
-                });
+                this.testseries_questions = this.questions.filter(question => question.subject_id == subject_id);
                 if(this.testseries_questions.length == 0){alert('This subject dont have any questions.')}
             },
 

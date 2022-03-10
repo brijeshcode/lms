@@ -187,19 +187,11 @@
                 this.subjectChapter(event.target.value);
             },
             classSubject(class_id){
-                this.class_subjects = [];
+                this.class_subjects = this.subjects.filter(subject => subject.class_id == class_id);
                 this.subject_chapters = [];
-                this.subjects.forEach(subject =>{
-                    if (subject.class_id == class_id) {this.class_subjects.push(subject);}
-                });
             },
             subjectChapter(subject_id){
-
-                this.subject_chapters = [];
-                this.chapters.forEach(chapter => {
-                    console.log(chapter.subject_id);
-                   if (chapter.subject_id == subject_id) {this.subject_chapters.push(chapter)} ;
-                });
+                this.subject_chapters = this.chapters.filter(chapter => chapter.subject_id == subject_id);
             },
 
             addOption(){

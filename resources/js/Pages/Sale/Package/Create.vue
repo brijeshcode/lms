@@ -21,15 +21,14 @@
                             <input id="package-image"  type="file" accept="image/png, image/jpeg" name="">
                         </div>
                     </div>
-                    <div class="grid grid-cols-1 gap-4 mb-4">
-                        <div class="control">
+
+                    <div class="grid gird-cols-1 gap-4 mb-4">
+                        <div class="control mb-4">
                             <form-label for="title" required value="Title" />
                             <form-input id="title" type="text" required class="mt-1 w-full" v-model="form.title" autocomplete="title" />
                             <input-error :message="form.errors.title" class="mt-2" />
                         </div>
-                    </div>
 
-                    <div class="grid gird-cols-1 mb-4">
                         <div>
                             <form-label for="description" value="Description" />
                             <form-text-area id="description" type="text" rows="3" class="mt-1 w-full" v-model.trim="form.description" autocomplete="description" />
@@ -40,7 +39,7 @@
                     <div class="grid gird-cols-1 mb:grid-cols-5 lg:grid-cols-5 gap-4 mb-4">
 
                         <div class="control" >
-                            <form-label for="is_free" value="Free access" />
+                            <form-label for="is_free" value="Is Free" />
                             <form-checkbox name="free" @click="form.regular_price = form.sell_price = 0 " v-model:checked="form.is_free" />
                             <input-error :message="form.errors.is_free" class="mt-2" />
                         </div>
@@ -55,9 +54,6 @@
                             <form-input id="sell_price" type="number" min="0" setp="0.01" required class="mt-1 w-full" v-model="form.sell_price" autocomplete="sell_price" />
                             <input-error :message="form.errors.sell_price" class="mt-2" />
                         </div>
-
-
-
                     </div>
 
 
@@ -79,8 +75,115 @@
                             <form-input id="end" type="date"  class="mt-1 w-full" v-model="form.end" autocomplete="end" />
                             <input-error :message="form.errors.end" class="mt-2" />
                         </div>
-
                     </div>
+
+                    <div class="my-4">
+                        <div class="border mb-4 rounded p-2 bg-gray-100">
+                            Package Items:
+                            <select v-model="current_package_type">
+                                <option v-for="(packateType) in packageTypes" :value="packateType" v-text="packateType"></option>
+                            </select>
+                            <simple-button @click="addPackageItem" class="ml-4 hover:bg-indigo-800 bg-blue-500" type="button" >Add</simple-button>
+                        </div>
+
+                        <div v-if="form.test_serires.length > 0" class="border rounded mb-4">
+                            <div class="heading bg-gray-100 p-2">
+                                <h2 class="uppercase inline-block ">Package test series</h2>
+                                <simple-button @click="addTestSeriesItem" class="ml-4 bg-green-500 hover:bg-green-800" type="button" >More</simple-button>
+                                <simple-button @click="removePackageItem('test_serires')" class="ml-4 bg-red-500 hover:bg-red-800" type="button" >Remove</simple-button>
+                            </div>
+                            <div class="p-2">
+                                <div v-for="(testItem, index) in form.test_serires" class="item border rounded bg-gray-50 mb-2 p-2 grid grid-cols-12 gap-4 hover:bg-gray-100">
+                                    <div class="col-span-7">
+                                        <select v-model="testItem.test_series_id" class="w-full" >
+                                            <option v-for="test in testSeries" :value="test.id">{{ test.title }}</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-span-4">
+                                        <form-text-area id="description" type="text" rows="2" class="mt-1 w-full" v-model="testItem.description" placeholder="Add Description to show in fron end" autocomplete="description" />
+                                    </div>
+                                    <div>
+                                        <div @click="removePackageItem('test_serires', index)" class="cursor-pointer" ><icon-remove class="text-white" /></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div v-if="form.live_classes.length > 0" class="border rounded mb-4">
+                            <div class="heading bg-gray-100 p-2">
+                                <h2 class="uppercase inline-block ">Package Live classes</h2>
+                                <simple-button @click="addLiveClassesItem" class="ml-4 bg-green-500 hover:bg-green-800" type="button" >More</simple-button>
+                                <simple-button @click="removePackageItem('live_classes')" class="ml-4 bg-red-500 hover:bg-red-800" type="button" >Remove</simple-button>
+                            </div>
+                            <div class="p-2">
+                                <div v-for="(liveClassItem, index) in form.live_classes" class="item border rounded bg-gray-50 mb-2 p-2 grid grid-cols-12 gap-4 hover:bg-gray-100">
+                                    <div class="col-span-7">
+                                        <select v-model="liveClassItem.live_class_id" class="w-full" >
+                                            <option v-for="liveClass in liveClasses" :value="liveClass.id">{{ liveClass.title }}</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-span-4">
+                                        <form-text-area id="description" type="text" rows="2" class="mt-1 w-full" v-model="liveClassItem.description" placeholder="Add Description to show in fron end" autocomplete="description" />
+                                    </div>
+                                    <div>
+                                        <div @click="removePackageItem('live_classes', index)" class="cursor-pointer" ><icon-remove class="text-white" /></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div v-if="form.recorded_classes.length > 0" class="border rounded mb-4">
+                            <div class="heading bg-gray-100 p-2">
+                                <h2 class="uppercase inline-block ">Package Recorded classes</h2>
+                                <simple-button @click="addRecordedClassesItem" class="ml-4 bg-green-500 hover:bg-green-800" type="button" >More</simple-button>
+                                <simple-button @click="removePackageItem('recorded_classes')" class="ml-4 bg-red-500 hover:bg-red-800" type="button" >Remove</simple-button>
+                            </div>
+                            <div v-for="(recordedClassItem, index) in form.recorded_classes" class="item border rounded bg-gray-50 mb-2 p-2 grid grid-cols-12 gap-4 hover:bg-gray-100">
+                                <div class="col-span-4">
+                                    <select v-model="recordedClassItem.recorded_class_id" class="w-full" >
+                                        <option v-for="recorcedClass in recordedClasses" :value="recorcedClass.id">{{ recorcedClass.name }}</option>
+                                    </select>
+                                </div>
+                                <div class="col-span-4">
+                                    <form-text-area id="description" type="text" rows="2" class="mt-1 w-full" v-model="recordedClassItem.description" placeholder="Add Description to show in fron end" autocomplete="description" />
+                                </div>
+                                <div>
+                                    <div @click="removePackageItem('recorded_classes', index)" class="cursor-pointer" ><icon-remove /></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div v-if="form.recorded_subjects.length > 0" class="border rounded mb-4">
+                            <div class="heading bg-gray-100 p-2">
+                                <h2 class="uppercase inline-block ">Package Recorded Subjects</h2>
+                                <simple-button @click="addRecordedSubjectsItem" class="ml-4 bg-green-500 hover:bg-green-800" type="button" >More</simple-button>
+                                <simple-button @click="removePackageItem('recorded_subjects')" class="ml-4 bg-red-500 hover:bg-red-800" type="button" >Remove</simple-button>
+                            </div>
+                            <div class="p-2">
+                                <div v-for="(recordSubjectItem, index) in form.recorded_subjects" class="item border rounded bg-gray-50 mb-2 p-2 grid grid-cols-12 gap-4 hover:bg-gray-100">
+                                <div class="col-span-3">
+                                    <select v-model="recordSubjectItem.recorded_class_id" @change="classChange($event)" class="w-full" >
+                                        <option disabled>Select Class</option>
+                                        <option v-for="recorcedClass in recordedClasses" :value="recorcedClass.id">{{ recorcedClass.name }}</option>
+                                    </select>
+                                </div>
+                                <div class="sm:col-span-3">
+                                    <select v-model="recordSubjectItem.recorded_subject_id" class="w-full" >
+                                        <option disabled>Select Subject</option>
+                                        <option v-for="recordedSubject in classSubjects" :value="recordedSubject.id">{{ recordedSubject.name }}</option>
+                                    </select>
+                                </div>
+                                <div class="col-span-4">
+                                    <form-text-area id="description" type="text" rows="2" class="mt-1 w-full" v-model="recordSubjectItem.description" placeholder="Add Description to show in fron end" autocomplete="description" />
+                                </div>
+                                <div>
+                                    <div @click="removePackageItem( 'recorded_subjects' , index)" class="cursor-pointer" ><icon-remove /></div>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+
 
                     <div class="grid gird-cols-1 mb-4">
                         <div>
@@ -120,6 +223,7 @@
     import InputError from '@/Shared/Components/Form/Simple/InputError.vue'
     import FormCheckbox from '@/Shared/Components/Form/Simple/Checkbox.vue'
     import BreadSimple from '@/Shared/Components/Breadcrum/Simple.vue'
+    import IconRemove from '@/Shared/Components/Icons/svg/Trash.vue'
     // import { Link } from '@inertiajs/inertia-vue3';
 
     export default defineComponent({
@@ -131,11 +235,15 @@
             BreadSimple,
             AdminLayout,
             SimpleButton,
-            FormCheckbox
+            FormCheckbox,
+            IconRemove
         },
-        props: ['package'],
+        props: ['package', 'testSeries', 'liveClasses', 'subjects', 'recordedClasses'],
          data: () => ({
             edit: false,
+            current_package_type: null,
+            classSubjects: [],
+            packageTypes : [ 'Test Series','Live classes', 'Recorded classes','Recorded subjects']
          }),
         setup () {
             const form = useForm({
@@ -148,7 +256,11 @@
               sell_price: 0,
               is_free: false,
               note: null,
-              active: false
+              active: false,
+              test_serires : [],
+              live_classes : [],
+              recorded_classes : [],
+              recorded_subjects : []
             })
             return { form  }
         },
@@ -160,7 +272,57 @@
             }
         },
         methods:{
+            addPackageItem(){
 
+                if(this.current_package_type == null){
+                    alert('Select package item first');
+                }else if (this.current_package_type == 'Test Series') {
+                    this.addTestSeriesItem();
+                }else if(this.current_package_type == 'Live classes'){
+                    this.addLiveClassesItem();
+                }else if(this.current_package_type == 'Recorded classes'){
+                    this.addRecordedClassesItem();
+                }else if(this.current_package_type == 'Recorded subjects'){
+                    this.addRecordedSubjectsItem();
+                }
+            },
+            removePackageItem(removeMe, index = ''){
+                if (confirm('Are you sure you want to remove this item?')) {
+                    if (index !== '') {
+                        this.form[removeMe].splice(index, 1);
+                    }else{
+                        this.form[removeMe] = [];
+                    }
+                }
+            },
+            addTestSeriesItem(){
+                this.form.test_serires.push({
+                    test_series_id: null,
+                    description: null
+                });
+            },
+            addLiveClassesItem(){
+                this.form.live_classes.push({
+                    live_class_id: null,
+                    description: null
+                });
+            },
+            addRecordedClassesItem(){
+                this.form.recorded_classes.push({
+                    recorded_class_id: null,
+                    description: null
+                });
+            },
+            addRecordedSubjectsItem(){
+                this.form.recorded_subjects.push({
+                    recorded_class_id: null,
+                    recorded_subject_id: null,
+                    description: null
+                });
+            },
+            classChange(event){
+                this.classSubjects = this.subjects.filter(subject => subject.class_id == event.target.value);
+            }
         }
     })
 </script>

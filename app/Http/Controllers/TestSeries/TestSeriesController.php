@@ -113,7 +113,7 @@ class TestSeriesController extends Controller
             ],
             [
                 'title.required' => 'Title is empty.',
-                'title.min' => "Invalid {$tempName}.",
+                'title.min' => "Title should be more then 3 characters.",
                 'class_id.required' => 'The class field is required.',
                 'subject_id.required' => 'The subject field is required.',
                 'chapter_id.required' => 'The chapter field is required.',

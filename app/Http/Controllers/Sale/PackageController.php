@@ -3,9 +3,15 @@
 namespace App\Http\Controllers\Sale;
 
 use App\Http\Controllers\Controller;
+use App\Models\LiveClasses\LiveClass;
 use App\Models\Sale\Packager\Package;
+use App\Models\Sale\Packager\PackageLiveClass;
+use App\Models\Sale\Packager\PackageRecordedClass;
+use App\Models\Sale\Packager\PackageRecordedSubject;
+use App\Models\Sale\Packager\PackageTestSeries;
 use App\Models\Setup\StudentClass;
 use App\Models\Setup\Subject;
+use App\Models\TestSeries\TestSeries;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -30,33 +36,115 @@ class PackageController extends Controller
 
     public function create()
     {
-        $classes = StudentClass::select('id', 'name')->whereActive(1)->has('subjects')->get();
+        $recordedClasses = StudentClass::select('id', 'name')->whereActive(1)->has('subjects')->get();
         $subjects = Subject::select('id', 'name', 'class_id')->whereActive(1)->get();
-        return Inertia::render('Sale/Package/Create', compact('classes', 'subjects'));
+        $liveClasses = LiveClass::select('id', 'title')->whereActive(1)->get();
+        $testSeries = TestSeries::select('id', 'title')->whereActive(1)->get();
+        return Inertia::render('Sale/Package/Create', compact('recordedClasses', 'subjects','testSeries', 'liveClasses'));
     }
 
     public function store(Request $request)
     {
         $this->validateFull($request);
         \DB::transaction(function() use ($request) {
-            Package::create($request->only('title', 'description', 'image',  'start', 'end', 'regular_price', 'sell_price', 'is_free', 'note', 'active'));
+            $package = Package::create($request->only('title', 'description', 'image',  'start', 'end', 'regular_price', 'sell_price', 'is_free', 'note', 'active'));
+            $package->testSerires()->createMany($request->test_serires);
+            $package->liveClasses()->createMany($request->live_classes);
+            $package->recordedSubjects()->createMany($request->recorded_subjects);
+            $package->recordedClasses()->createMany($request->recorded_classes);
         });
         return redirect(route('package.index'))->with('type', 'success')->with('message', 'Package added successfully !!');
     }
 
     public function edit(Package $package)
     {
-
-        $classes = StudentClass::select('id', 'name')->whereActive(1)->has('subjects')->get();
+        $package->load('testSerires', 'recordedSubjects', 'recordedClasses', 'liveClasses');
+        $recordedClasses = StudentClass::select('id', 'name')->whereActive(1)->has('subjects')->get();
         $subjects = Subject::select('id', 'name', 'class_id')->whereActive(1)->get();
-        return Inertia::render('Sale/Package/Create', compact('classes', 'subjects', 'package'));
+        $liveClasses = LiveClass::select('id', 'title')->whereActive(1)->get();
+        $testSeries = TestSeries::select('id', 'title')->whereActive(1)->get();
+        return Inertia::render('Sale/Package/Create', compact('recordedClasses', 'subjects', 'liveClasses', 'testSeries', 'package'));
     }
 
     public function update(Request $request, Package $package)
     {
         $this->validateFull($request);
+        \DB::transaction(function() use ($request, $package) {
+        $this->updatePackgaeItems($request, $package);
         $package->update($request->only('title', 'description', 'image','start', 'end', 'regular_price', 'sell_price', 'is_free', 'note', 'active'));
+        });
         return redirect(route('package.index'))->with('type', 'success')->with('message', 'Package updated successfully !!');
+    }
+
+    private function updatePackgaeItems($request, $package){
+        $this->updateTestSeries($request->test_serires, $package);
+        $this->updateLiveClasses($request->live_classes, $package);
+        $this->updateRecordedClasses($request->recorded_classes, $package);
+        $this->updateRecordedSubjects($request->recorded_subjects, $package);
+    }
+
+    private function updateTestSeries($requestData, $packages){
+        $currentItems = collect($requestData)->where('id', '!=', '');
+        $currentItems->map(function ($item){
+            PackageTestSeries::whereId($item['id'])
+                ->update(collect($item)
+                    ->only('test_series_id', 'description')
+                    ->toArray()
+                );
+        });
+
+        // delete removed questions
+        $packages->testSerires()->whereNotIn('id', $currentItems->pluck('id'))->delete();
+        // create new questions
+        $packages->testSerires()->createMany(collect($requestData)->where('id' ,'' ));
+    }
+
+    private function updateLiveClasses($requestData, $packages){
+        $currentItems = collect($requestData)->where('id', '!=', '');
+        $currentItems->map(function ($item){
+            PackageLiveClass::whereId($item['id'])
+                ->update(collect($item)
+                    ->only('live_class_id', 'description')
+                    ->toArray()
+                );
+        });
+
+        // delete removed questions
+        $packages->liveClasses()->whereNotIn('id', $currentItems->pluck('id'))->delete();
+        // create new questions
+        $packages->liveClasses()->createMany(collect($requestData)->where('id' ,'' ));
+    }
+
+    private function updateRecordedClasses($requestData, $packages){
+        $currentItems = collect($requestData)->where('id', '!=', '');
+        $currentItems->map(function ($item){
+            PackageRecordedClass::whereId($item['id'])
+                ->update(collect($item)
+                    ->only('recorded_class_id', 'description')
+                    ->toArray()
+                );
+        });
+
+        // delete removed questions
+        $packages->recordedClasses()->whereNotIn('id', $currentItems->pluck('id'))->delete();
+        // create new questions
+        $packages->recordedClasses()->createMany(collect($requestData)->where('id' ,'' ));
+    }
+
+    private function updateRecordedSubjects($requestData, $packages){
+        $currentItems = collect($requestData)->where('id', '!=', '');
+        $currentItems->map(function ($item){
+            PackageRecordedSubject::whereId($item['id'])
+                ->update(collect($item)
+                    ->only('live_class_id', 'recorded_subject_id', 'description')
+                    ->toArray()
+                );
+        });
+
+        // delete removed questions
+        $packages->recordedSubjects()->whereNotIn('id', $currentItems->pluck('id'))->delete();
+        // create new questions
+        $packages->recordedSubjects()->createMany(collect($requestData)->where('id' ,'' ));
     }
 
     private function validateFull($request)
@@ -68,14 +156,7 @@ class PackageController extends Controller
                 'regular_price' => "required|numeric|min:0",
                 'sell_price' => "required|numeric|min:0|lte:regular_price",
                 'start' =>  'required|date',
-                'end' =>  'after:start',
-                /*'class_id' => 'required',
-                'subject_id' => 'required',
-                'chapter_id' => 'required',
-                'options' => "array|min:2",
-                'options.*.option' => "required|string|min:3",
-                'options.*.option_number' => "required|string|min:1",
-                'options.*.is_correct' => "required|boolean",*/
+                'end' =>  'nullable|after:start',
             ],
             [
                 'title.required' => 'Title is empty.',
@@ -87,14 +168,9 @@ class PackageController extends Controller
                 'sell_price.numeric' => ' Sell Price must be a number.',
                 'sell_price.min' => ' Sell Price should be zero or greater.',
                 'sell_price.lte' => ' Sell Price cannot be greater then Regular price.',
-                'start.required' => 'Start package date required',
-                'end.after' => 'End should be after Start',
+                'start.required' => 'Start package date required.',
+                'end.after' => 'End should be after Start.',
 
-                /*'class_id.required' => 'The class field is required.',
-                'subject_id.required' => 'The subject field is required.',
-                'chapter_id.required' => 'The chapter field is required.',
-                'options.*.option.required' => 'Option is empty.',
-                'options.*.option_number.required' => 'Index is empty.',*/
             ]
         );
     }
