@@ -2,11 +2,14 @@
 
 use App\Http\Controllers\LiveClasses\LiveClassController;
 use App\Http\Controllers\LiveClasses\LiveSessionController;
+use App\Http\Controllers\Sale\OrderController;
 use App\Http\Controllers\Sale\PackageController;
 use App\Http\Controllers\Setup\ChapterController;
+use App\Http\Controllers\Setup\RolesController;
 use App\Http\Controllers\Setup\StudentClassController;
 use App\Http\Controllers\Setup\SubjectController;
 use App\Http\Controllers\Setup\TopicController;
+use App\Http\Controllers\Setup\UsersController;
 use App\Http\Controllers\TestSeries\QuestionController;
 use App\Http\Controllers\TestSeries\TestSeriesController;
 use Illuminate\Foundation\Application;
@@ -51,4 +54,9 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::resource('/liveClass', LiveClassController::class)->except(['destroy']);
     Route::resource('/liveSession', LiveSessionController::class)->except(['destroy']);
     Route::resource('/package', PackageController::class)->except(['destroy']);
+    Route::resource('/order', OrderController::class);
+
+
+    Route::resource('/users', UsersController::class)->except(['destroy', 'show']);
+    Route::resource('/roles', RolesController::class)->except(['destroy', 'show']);
 });
