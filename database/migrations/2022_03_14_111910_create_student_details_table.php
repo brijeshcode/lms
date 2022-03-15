@@ -13,24 +13,18 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('student_details', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password')->nullable();
-            $table->rememberToken();
-            $table->foreignId('current_team_id')->nullable();
-            $table->string('profile_photo_path', 2048)->nullable();
+            $table->unsignedBigInteger('student_id');
+            $table->string('key',200);
+            $table->text('value')->nullable();
 
-            $table->string('mobile', 15)->unique()->nullable();
-            $table->boolean('is_student')->default(0);
-
+            $table->text('note')->nullable()->comment('additional information for this entry');
             $table->boolean('active')->default(true);
-            $table->text('note')->nullable();
-
             $table->unsignedBigInteger('user_id')->default('1');
             $table->ipAddress('user_ip')->default('127.0.0.1');
+
+            $table->softDeletes();
             $table->timestamps();
         });
     }
@@ -42,6 +36,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('student_details');
     }
 };

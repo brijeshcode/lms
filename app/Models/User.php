@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\StudentDetail;
 use App\Traits\Authorable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -33,6 +34,8 @@ class User extends Authenticatable
         'password',
         'note',
         'active',
+        'is_student',
+        'mobile',
         'user_id', // who added this user
         'user_ip' // location
     ];
@@ -58,6 +61,7 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'active' => 'boolean',
+        'is_student' => 'boolean',
     ];
 
     /**
@@ -99,5 +103,10 @@ class User extends Authenticatable
             return $role[0]->name;
         }
         return '';
+    }
+
+    public function details()
+    {
+        return $this->hasMany(StudentDetail::class, 'student_id');
     }
 }
