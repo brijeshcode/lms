@@ -1012,9 +1012,6 @@ select {
 .col-span-4 {
   grid-column: span 4 / span 4;
 }
-.col-span-7 {
-  grid-column: span 7 / span 7;
-}
 .col-span-3 {
   grid-column: span 3 / span 3;
 }

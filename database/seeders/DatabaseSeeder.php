@@ -1,6 +1,7 @@
 <?php
 
 use Database\Seeders\ChapterSeeder;
+use Database\Seeders\PermissionSeeder;
 use Database\Seeders\StudentClassSeeder;
 use Database\Seeders\UserSeeder;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -19,5 +20,6 @@ class DatabaseSeeder extends Seeder
 
         $this->call(StudentClassSeeder::class);
 
+        $this->call(PermissionSeeder::class);
     }
 }

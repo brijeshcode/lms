@@ -13,16 +13,16 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('package_test_series', function (Blueprint $table) {
+        Schema::create('package_subject_chapters', function (Blueprint $table) {
             $table->id();
 
             $table->unsignedBigInteger('package_id');
-            $table->unsignedBigInteger('test_series_id');
-            $table->text('description')->nullable();
+            $table->unsignedBigInteger('package_subject_id');
+            $table->unsignedBigInteger('class_id');
+            $table->unsignedBigInteger('subject_id');
+            $table->unsignedBigInteger('chapter_id');
             $table->boolean('is_free')->default(false);
 
-            $table->text('note')->nullable()->comment('additional information for this entry');
-            $table->boolean('active')->default(true);
             $table->unsignedBigInteger('user_id')->default('1');
             $table->ipAddress('user_ip')->default('127.0.0.1');
 
@@ -38,6 +38,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('package_test_series');
+        Schema::dropIfExists('package_subject_chapters');
     }
 };

@@ -8,7 +8,9 @@ use App\Models\Sale\Packager\Package;
 use App\Models\Sale\Packager\PackageLiveClass;
 use App\Models\Sale\Packager\PackageRecordedClass;
 use App\Models\Sale\Packager\PackageRecordedSubject;
+use App\Models\Sale\Packager\PackageSubjectChapter;
 use App\Models\Sale\Packager\PackageTestSeries;
+use App\Models\Setup\Chapter;
 use App\Models\Setup\StudentClass;
 use App\Models\Setup\Subject;
 use App\Models\TestSeries\TestSeries;
@@ -31,6 +33,7 @@ class PackageController extends Controller
             ->paginate(10)
             ->withQueryString()
             ;
+
         return Inertia::render('Sale/Package/Index' , compact('packages'));
     }
 
@@ -38,20 +41,43 @@ class PackageController extends Controller
     {
         $recordedClasses = StudentClass::select('id', 'name')->whereActive(1)->has('subjects')->get();
         $subjects = Subject::select('id', 'name', 'class_id')->whereActive(1)->get();
+        $chapters = Chapter::select('id', 'class_id', 'subject_id', 'name')->whereActive(1)->get();
         $liveClasses = LiveClass::select('id', 'title')->whereActive(1)->get();
         $testSeries = TestSeries::select('id', 'title')->whereActive(1)->get();
-        return Inertia::render('Sale/Package/Create', compact('recordedClasses', 'subjects','testSeries', 'liveClasses'));
+        return Inertia::render('Sale/Package/Create', compact('recordedClasses', 'subjects','testSeries', 'chapters', 'liveClasses'));
     }
 
     public function store(Request $request)
     {
         $this->validateFull($request);
         \DB::transaction(function() use ($request) {
+
             $package = Package::create($request->only('title', 'description', 'image',  'start', 'end', 'regular_price', 'sell_price', 'is_free', 'note', 'active'));
             $package->testSerires()->createMany($request->test_serires);
             $package->liveClasses()->createMany($request->live_classes);
-            $package->recordedSubjects()->createMany($request->recorded_subjects);
             $package->recordedClasses()->createMany($request->recorded_classes);
+            if (!empty($request->recorded_subjects)) {
+                foreach ($request->recorded_subjects as $key => $subject) {
+                    $packageSubject = PackageRecordedSubject::create([
+                        'package_id' => $package->id,
+                        'recorded_class_id' => $subject['recorded_class_id'],
+                        'recorded_subject_id' => $subject['recorded_subject_id'],
+                        'description' => $subject['description']
+                    ]);
+
+                    foreach ($subject['chapters'] as $key => $chapter) {
+                        PackageSubjectChapter::create([
+                            'package_id' => $packageSubject->package_id,
+                            'class_id' => $chapter['class_id'],
+                            'subject_id' => $chapter['subject_id'],
+                            'class_id' => $chapter['class_id'],
+                            'chapter_id' => $chapter['chapter_id'],
+                            'package_subject_id' => $packageSubject->id
+                        ]);
+                    }
+                }
+            }
+            // $package->recordedSubjects()->createMany($request->recorded_subjects);
         });
         return redirect(route('package.index'))->with('type', 'success')->with('message', 'Package added successfully !!');
     }

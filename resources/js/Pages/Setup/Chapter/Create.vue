@@ -33,11 +33,11 @@
                             <input-error :message="form.errors.subject_id" class="mt-2" />
                         </div>
 
-                        <div class="control" >
+                        <!-- <div class="control" >
                             <form-label for="is_free" required value="Free access" />
                             <form-checkbox name="free" v-model:checked="form.is_free" />
                             <input-error :message="form.errors.is_free" class="mt-2" />
-                        </div>
+                        </div> -->
 
 
                     </div>

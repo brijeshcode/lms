@@ -45,6 +45,6 @@ class PermissionSeeder extends Seeder
         $user = User::whereId(2)->first();
         $user->assignRole('super-admin');
 
-        $role = Role::create(['name' => 'customer']);
+        $role = Role::create(['name' => 'Student']);
     }
 }

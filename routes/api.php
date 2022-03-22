@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\ClassController;
 use App\Http\Controllers\API\LiveClassController;
+use App\Http\Controllers\API\PackagesController;
 use App\Http\Controllers\API\StudentController;
 use App\Http\Controllers\API\TestSeriesController;
 use Illuminate\Http\Request;
@@ -24,6 +25,7 @@ Route::prefix($version)->group(function () {
     Route::post('/register', [StudentController::class, 'register']);
     Route::post('/login', [StudentController::class, 'login']);
 });
+    Route::get('v1/packages/{packageId}', [PackagesController::class, 'show']);
 
 Route::fallback(function () {
     $response = [
@@ -46,4 +48,5 @@ Route::middleware('auth:sanctum')->prefix($version)->group(function () {
 
     Route::get('/testseries', [TestSeriesController::class, 'getTests']);
     Route::get('/testseries/{testSeries}', [TestSeriesController::class, 'getTest']);
+    Route::get('/packages', [PackagesController::class, 'packages']);
 });

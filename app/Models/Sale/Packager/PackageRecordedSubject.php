@@ -2,6 +2,7 @@
 
 namespace App\Models\Sale\Packager;
 
+use App\Models\Setup\Subject;
 use App\Traits\Authorable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -18,4 +19,14 @@ class PackageRecordedSubject extends Model
       'active' => 'boolean',
     ];
 
+
+    public function chapters()
+    {
+      return $this->hasMany(PackageSubjectChapter::class, 'package_subject_id');
+    }
+
+    public function subject()
+    {
+      return $this->belongsTo(Subject::class, 'recorded_subject_id');
+    }
 }

@@ -2,26 +2,26 @@
 
 namespace App\Models\Sale\Packager;
 
-use App\Models\TestSeries\TestSeries;
+use App\Models\Setup\Chapter;
 use App\Traits\Authorable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class PackageTestSeries extends Model
+class PackageSubjectChapter extends Model
 {
     use HasFactory;
     use SoftDeletes;
     use Authorable;
-    protected $fillable = [ 'package_id', 'is_free', 'test_series_id', 'description', 'note', 'active'];
+    protected $fillable = ['package_subject_id', 'package_id', 'class_id', 'subject_id','chapter_id', 'is_free'];
 
     protected $casts = [
-      'active' => 'boolean',
       'is_free' => 'boolean'
     ];
 
-    public function testseries()
+    public function chapter()
     {
-      return $this->belongsTo(TestSeries::class, 'test_series_id');
+      return $this->belongsTo(Chapter::class, 'chapter_id');
     }
+
 }

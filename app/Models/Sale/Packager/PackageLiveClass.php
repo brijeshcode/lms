@@ -2,6 +2,7 @@
 
 namespace App\Models\Sale\Packager;
 
+use App\Models\LiveClasses\LiveClass;
 use App\Models\Sale\Packager\Package;
 use App\Traits\Authorable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -22,5 +23,10 @@ class PackageLiveClass extends Model
     public function package()
     {
       return $this->belongsTo(Package::class);
+    }
+
+    public function liveClass()
+    {
+      return $this->belongsTo(LiveClass::class, 'live_class_id');
     }
 }

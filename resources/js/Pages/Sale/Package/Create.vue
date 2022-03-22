@@ -94,13 +94,17 @@
                             </div>
                             <div class="p-2">
                                 <div v-for="(testItem, index) in form.test_serires" class="item border rounded bg-gray-50 mb-2 p-2 grid grid-cols-12 gap-4 hover:bg-gray-100">
-                                    <div class="col-span-7">
+                                    <div class="col-span-6">
                                         <select v-model="testItem.test_series_id" class="w-full" >
                                             <option v-for="test in testSeries" :value="test.id">{{ test.title }}</option>
                                         </select>
                                     </div>
                                     <div class="col-span-4">
                                         <form-text-area id="description" type="text" rows="2" class="mt-1 w-full" v-model="testItem.description" placeholder="Add Description to show in fron end" autocomplete="description" />
+                                    </div>
+                                    <div>
+                                        <form-label value="Free" />
+                                        <form-checkbox name="free" v-model:checked="testItem.is_free" />
                                     </div>
                                     <div>
                                         <div @click="removePackageItem('test_serires', index)" class="cursor-pointer" ><icon-remove class="text-white" /></div>
@@ -117,7 +121,7 @@
                             </div>
                             <div class="p-2">
                                 <div v-for="(liveClassItem, index) in form.live_classes" class="item border rounded bg-gray-50 mb-2 p-2 grid grid-cols-12 gap-4 hover:bg-gray-100">
-                                    <div class="col-span-7">
+                                    <div class="col-span-6">
                                         <select v-model="liveClassItem.live_class_id" class="w-full" >
                                             <option v-for="liveClass in liveClasses" :value="liveClass.id">{{ liveClass.title }}</option>
                                         </select>
@@ -125,6 +129,7 @@
                                     <div class="col-span-4">
                                         <form-text-area id="description" type="text" rows="2" class="mt-1 w-full" v-model="liveClassItem.description" placeholder="Add Description to show in fron end" autocomplete="description" />
                                     </div>
+
                                     <div>
                                         <div @click="removePackageItem('live_classes', index)" class="cursor-pointer" ><icon-remove class="text-white" /></div>
                                     </div>
@@ -161,25 +166,38 @@
                             </div>
                             <div class="p-2">
                                 <div v-for="(recordSubjectItem, index) in form.recorded_subjects" class="item border rounded bg-gray-50 mb-2 p-2 grid grid-cols-12 gap-4 hover:bg-gray-100">
-                                <div class="col-span-3">
-                                    <select v-model="recordSubjectItem.recorded_class_id" @change="classChange($event)" class="w-full" >
-                                        <option disabled>Select Class</option>
-                                        <option v-for="recorcedClass in recordedClasses" :value="recorcedClass.id">{{ recorcedClass.name }}</option>
-                                    </select>
+                                    <div class="col-span-3">
+                                        <select v-model="recordSubjectItem.recorded_class_id" @change="classChange($event)" class="w-full" >
+                                            <option disabled>Select Class</option>
+                                            <option v-for="recorcedClass in recordedClasses" :value="recorcedClass.id">{{ recorcedClass.name }}</option>
+                                        </select>
+                                    </div>
+                                    <div class="sm:col-span-3">
+                                        <select v-model="recordSubjectItem.recorded_subject_id" @change="subjectChange($event, index)" class="w-full" >
+                                            <option disabled>Select Subject</option>
+                                            <option v-for="recordedSubject in classSubjects" :value="recordedSubject.id">{{ recordedSubject.name }}</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-span-4">
+                                        <form-text-area id="description" type="text" rows="2" class="mt-1 w-full" v-model="recordSubjectItem.description" placeholder="Add Description to show in fron end" autocomplete="description" />
+                                    </div>
+                                    <div>
+                                        <div @click="removePackageItem( 'recorded_subjects' , index)" class="cursor-pointer" ><icon-remove /></div>
+                                    </div>
+
+                                    <div class="chapter col-span-6">
+                                        <table>
+                                            <tr>
+                                                <th>Chapter Title</th>
+                                                <th>Free / Demo</th>
+                                            </tr>
+                                            <tr v-for="chappter in recordSubjectItem.chapters" >
+                                                <td>{{ chappter.name }}</td>
+                                                <td><form-checkbox name="free" v-model:checked="chappter.is_free" /></td>
+                                            </tr>
+                                        </table>
+                                    </div>
                                 </div>
-                                <div class="sm:col-span-3">
-                                    <select v-model="recordSubjectItem.recorded_subject_id" class="w-full" >
-                                        <option disabled>Select Subject</option>
-                                        <option v-for="recordedSubject in classSubjects" :value="recordedSubject.id">{{ recordedSubject.name }}</option>
-                                    </select>
-                                </div>
-                                <div class="col-span-4">
-                                    <form-text-area id="description" type="text" rows="2" class="mt-1 w-full" v-model="recordSubjectItem.description" placeholder="Add Description to show in fron end" autocomplete="description" />
-                                </div>
-                                <div>
-                                    <div @click="removePackageItem( 'recorded_subjects' , index)" class="cursor-pointer" ><icon-remove /></div>
-                                </div>
-                            </div>
                             </div>
                         </div>
                     </div>
@@ -238,11 +256,12 @@
             FormCheckbox,
             IconRemove
         },
-        props: ['package', 'testSeries', 'liveClasses', 'subjects', 'recordedClasses'],
+        props: ['package', 'testSeries', 'liveClasses', 'subjects', 'chapters', 'recordedClasses'],
          data: () => ({
             edit: false,
             current_package_type: null,
             classSubjects: [],
+            subjectChapters: [],
             packageTypes : [ 'Test Series','Live classes', 'Recorded classes','Recorded subjects']
          }),
         setup () {
@@ -298,7 +317,8 @@
             addTestSeriesItem(){
                 this.form.test_serires.push({
                     test_series_id: null,
-                    description: null
+                    description: null,
+                    is_free: false
                 });
             },
             addLiveClassesItem(){
@@ -317,11 +337,29 @@
                 this.form.recorded_subjects.push({
                     recorded_class_id: null,
                     recorded_subject_id: null,
-                    description: null
+                    description: null,
+                    chapters : []
                 });
             },
-            classChange(event){
+            classChange(event, index){
                 this.classSubjects = this.subjects.filter(subject => subject.class_id == event.target.value);
+            },
+            subjectChange(event, index){
+                this.form.recorded_subjects[index].chapters = [];
+                let chapters = this.chapters.filter(chapter => chapter.subject_id == event.target.value);
+
+                chapters.forEach((chapter , key) => {
+                    // this.form.recorded_subjects[index].chapters[key].is_free   = false;
+                    this.form.recorded_subjects[index].chapters.push({
+                        class_id : chapter.class_id,
+                        name: chapter.name,
+                        subject_id : chapter.subject_id,
+                        chapter_id : chapter.id,
+                        is_free : false,
+                    });
+                });
+
+                console.log(this.form.recorded_subjects[index].chapters);
             }
         }
     })

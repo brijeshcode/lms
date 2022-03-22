@@ -31,9 +31,9 @@
                           <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Chapter
                           </th>
-                          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <!-- <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Free Access
-                          </th>
+                          </th> -->
                           <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Status
                           </th>
@@ -51,10 +51,10 @@
                               <div class="text-sm text-gray-500">{{ chapter.subject.student_class.name }}, {{ chapter.subject.name }}</div>
                             </Edit-link>
                           </td>
-                          <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <!-- <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                             <lockOpen-icon v-if="chapter.is_free" />
                             <lock-icon v-else />
-                          </td>
+                          </td> -->
                           <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                             <span v-if="chapter.active" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                               Active
