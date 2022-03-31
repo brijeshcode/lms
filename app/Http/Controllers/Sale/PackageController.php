@@ -52,10 +52,21 @@ class PackageController extends Controller
         $this->validateFull($request);
         \DB::transaction(function() use ($request) {
 
-            $package = Package::create($request->only('title', 'description', 'image',  'start', 'end', 'regular_price', 'sell_price', 'is_free', 'note', 'active'));
-            $package->testSerires()->createMany($request->test_serires);
-            $package->liveClasses()->createMany($request->live_classes);
-            $package->recordedClasses()->createMany($request->recorded_classes);
+            $package = Package::create($request->only('title', 'description', 'start', 'end', 'regular_price', 'sell_price', 'is_free', 'note', 'active'));
+
+            if (is_object($request->image)) {
+                $package->image = uploadFile($request->image);
+                $package->save();
+            }
+            if (!is_null($request->test_serires)) {
+                $package->testSerires()->createMany($request->test_serires);
+            }
+            if (!is_null($request->live_classes)) {
+                $package->liveClasses()->createMany($request->live_classes);
+            }
+            if (!is_null($request->recorded_classes)) {
+                $package->recordedClasses()->createMany($request->recorded_classes);
+            }
             if (!empty($request->recorded_subjects)) {
                 foreach ($request->recorded_subjects as $key => $subject) {
                     $packageSubject = PackageRecordedSubject::create([
@@ -72,6 +83,7 @@ class PackageController extends Controller
                             'subject_id' => $chapter['subject_id'],
                             'class_id' => $chapter['class_id'],
                             'chapter_id' => $chapter['chapter_id'],
+                            'is_free' => $chapter['is_free'],
                             'package_subject_id' => $packageSubject->id
                         ]);
                     }
@@ -84,20 +96,27 @@ class PackageController extends Controller
 
     public function edit(Package $package)
     {
-        $package->load('testSerires', 'recordedSubjects', 'recordedClasses', 'liveClasses');
+        $package->load('testSerires', 'recordedSubjects', 'recordedClasses', 'recordedSubjects.chapters.chapter', 'liveClasses');
         $recordedClasses = StudentClass::select('id', 'name')->whereActive(1)->has('subjects')->get();
+        $chapters = Chapter::select('id', 'class_id', 'subject_id', 'name')->whereActive(1)->get();
         $subjects = Subject::select('id', 'name', 'class_id')->whereActive(1)->get();
         $liveClasses = LiveClass::select('id', 'title')->whereActive(1)->get();
         $testSeries = TestSeries::select('id', 'title')->whereActive(1)->get();
-        return Inertia::render('Sale/Package/Create', compact('recordedClasses', 'subjects', 'liveClasses', 'testSeries', 'package'));
+        return Inertia::render('Sale/Package/Create', compact('recordedClasses', 'subjects', 'liveClasses', 'testSeries', 'package', 'chapters'));
     }
 
     public function update(Request $request, Package $package)
     {
         $this->validateFull($request);
         \DB::transaction(function() use ($request, $package) {
-        $this->updatePackgaeItems($request, $package);
-        $package->update($request->only('title', 'description', 'image','start', 'end', 'regular_price', 'sell_price', 'is_free', 'note', 'active'));
+
+            if (is_object($request->image)) {
+                trashedFile($package->image);
+                $package->image = uploadFile($request->image);
+                $package->save();
+            }
+            // $this->updatePackgaeItems($request, $package);
+            $package->update($request->only('title', 'description','start', 'end', 'regular_price', 'sell_price', 'is_free', 'note', 'active'));
         });
         return redirect(route('package.index'))->with('type', 'success')->with('message', 'Package updated successfully !!');
     }
@@ -114,7 +133,7 @@ class PackageController extends Controller
         $currentItems->map(function ($item){
             PackageTestSeries::whereId($item['id'])
                 ->update(collect($item)
-                    ->only('test_series_id', 'description')
+                    ->only('test_series_id', 'is_free', 'description')
                     ->toArray()
                 );
         });
@@ -158,19 +177,64 @@ class PackageController extends Controller
     }
 
     private function updateRecordedSubjects($requestData, $packages){
+
+        if (!empty($requestData)) {
+                foreach ($requestData as $key => $subject) {
+
+                }
+            }
+
         $currentItems = collect($requestData)->where('id', '!=', '');
-        $currentItems->map(function ($item){
-            PackageRecordedSubject::whereId($item['id'])
-                ->update(collect($item)
+       /* $currentItems->map(function ($subject){
+            PackageRecordedSubject::whereId($subject['id'])
+                ->update(collect($subject)
                     ->only('live_class_id', 'recorded_subject_id', 'description')
                     ->toArray()
                 );
-        });
 
-        // delete removed questions
+
+                foreach ($subject['chapters'] as $key => $chapter) {
+                    PackageSubjectChapter::where('package_subject_id', $subject['id'])
+                    ->update([
+                        'class_id' => $chapter['class_id'],
+                        'subject_id' => $chapter['subject_id'],
+                        'class_id' => $chapter['class_id'],
+                        'chapter_id' => $chapter['chapter_id'],
+                        'is_free' => $chapter['is_free']
+                    ]);
+                }
+        });*/
+
+        // delete removed package subject
+        dd($packages->recordedSubjects()->whereNotIn('id', $currentItems->pluck('id')));
+        $packages->recordedSubjects()->whereNotIn('id', $currentItems->pluck('id'))->chapters()->delete();
         $packages->recordedSubjects()->whereNotIn('id', $currentItems->pluck('id'))->delete();
-        // create new questions
-        $packages->recordedSubjects()->createMany(collect($requestData)->where('id' ,'' ));
+
+
+        // create new package subject
+        if (!empty(collect($requestData)->where('id' ,'' ))) {
+            foreach (collect($requestData)->where('id' ,'' ) as $key => $subject) {
+                $packageSubject = PackageRecordedSubject::create([
+                    'package_id' => $packages->id,
+                    'recorded_class_id' => $subject['recorded_class_id'],
+                    'recorded_subject_id' => $subject['recorded_subject_id'],
+                    'description' => $subject['description']
+                ]);
+
+                foreach ($subject['chapters'] as $key => $chapter) {
+                    PackageSubjectChapter::create([
+                        'package_id' => $packageSubject->package_id,
+                        'class_id' => $chapter['class_id'],
+                        'subject_id' => $chapter['subject_id'],
+                        'class_id' => $chapter['class_id'],
+                        'chapter_id' => $chapter['chapter_id'],
+                        'is_free' => $chapter['is_free'],
+                        'package_subject_id' => $packageSubject->id
+                    ]);
+                }
+            }
+        }
+        // $packages->recordedSubjects()->createMany(collect($requestData)->where('id' ,'' ));
     }
 
     private function validateFull($request)

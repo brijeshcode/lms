@@ -14,11 +14,18 @@
 
         <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
             <div class="p-2">
-                <form  @submit.prevent=" package ? form.put(route('package.update', package.id)) : form.post(route('package.store'))">
+                <form  @submit.prevent="submitData">
+                    <div v-if=" package && package.image_url" class="grid gird-cols-1 mb-4">
+                        <div>
+                             <img :src="package.image_url" style="width:350px;" />
+                        </div>
+                    </div>
+
                     <div class="grid gird-cols-1 mb-4">
                         <div>
                             <form-label for="package-image" value="Thumbnail Image" />
-                            <input id="package-image"  type="file" accept="image/png, image/jpeg" name="">
+                            <input type="file" id="package-image" @input="form.image = $event.target.files[0]" class="  w-full border-[1.5px] border-form-stroke rounded-lg font-medium text-body-color placeholder-body-color outline-none focus:border-primary active:border-primary transition  disabled:bg-[#F5F7FD] disabled:cursor-default cursor-pointer file:bg-[#F5F7FD] file:border-0 file:border-solid file:border-r file:border-collapse file:border-form-stroke file:py-3 file:px-5 file:mr-5 file:text-body-color file:cursor-pointer file:hover:bg-primary file:hover:bg-opacity-10" accept="image/png, image/jpeg" />
+
                         </div>
                     </div>
 
@@ -100,7 +107,7 @@
                                         </select>
                                     </div>
                                     <div class="col-span-4">
-                                        <form-text-area id="description" type="text" rows="2" class="mt-1 w-full" v-model="testItem.description" placeholder="Add Description to show in fron end" autocomplete="description" />
+                                        <form-text-area type="text" rows="2" class="mt-1 w-full" v-model="testItem.description" placeholder="Add Description to show in fron end" autocomplete="description" />
                                     </div>
                                     <div>
                                         <form-label value="Free" />
@@ -192,7 +199,7 @@
                                                 <th>Free / Demo</th>
                                             </tr>
                                             <tr v-for="chappter in recordSubjectItem.chapters" >
-                                                <td>{{ chappter.name }}</td>
+                                                <td>{{ chappter.chapter.name }}</td>
                                                 <td><form-checkbox name="free" v-model:checked="chappter.is_free" /></td>
                                             </tr>
                                         </table>
@@ -266,6 +273,7 @@
          }),
         setup () {
             const form = useForm({
+              _method: 'PUT',
               title: null,
               start: new Date().toISOString().slice(0,10),
               end: null,
@@ -281,13 +289,27 @@
               recorded_classes : [],
               recorded_subjects : []
             })
-            return { form  }
+
+            function submitData(){
+                if (this.package) {
+                    form.post(route('package.update', this.package.id));
+                }else{
+                    delete form._method;
+                    form.post(route('package.store'));
+                }
+
+            }
+            return { form , submitData }
         },
 
         created(){
             if (this.package) {
                 Object.keys(this.package).forEach(index => this.form[index] = this.package[index]);
                 this.edit = true;
+                this.form.recorded_subjects.forEach((subject, index) => {
+                   this.listSubject(subject.recorded_subject_id, index);
+                });
+                console.log(this.form.recorded_subjects);
             }
         },
         methods:{
@@ -342,24 +364,30 @@
                 });
             },
             classChange(event, index){
-                this.classSubjects = this.subjects.filter(subject => subject.class_id == event.target.value);
+                this.listSubject(event.target.value, index);
             },
             subjectChange(event, index){
+                this.listChapter(event.target.value, index);
+            },
+
+            listSubject(class_id, index){
+                this.classSubjects = this.subjects.filter(subject => subject.class_id == class_id);
+            },
+
+            listChapter(subject_id, index){
                 this.form.recorded_subjects[index].chapters = [];
-                let chapters = this.chapters.filter(chapter => chapter.subject_id == event.target.value);
+                let chapters = this.chapters.filter(chapter => chapter.subject_id == subject_id);
 
                 chapters.forEach((chapter , key) => {
                     // this.form.recorded_subjects[index].chapters[key].is_free   = false;
                     this.form.recorded_subjects[index].chapters.push({
                         class_id : chapter.class_id,
-                        name: chapter.name,
+                        chapter: chapter,
                         subject_id : chapter.subject_id,
                         chapter_id : chapter.id,
                         is_free : false,
                     });
                 });
-
-                console.log(this.form.recorded_subjects[index].chapters);
             }
         }
     })

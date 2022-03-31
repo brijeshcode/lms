@@ -24,6 +24,16 @@ class Package extends Model
       'is_free' => 'boolean'
     ];
 
+    protected $appends = [
+        'image_url',
+    ];
+
+    public function getImageUrlAttribute()
+    {
+        if (isset($this->attributes['image'])) {
+            return url('/'). $this->attributes['image'];
+        }
+    }
     public function liveClasses()
     {
         return $this->hasMany(PackageLiveClass::class);
